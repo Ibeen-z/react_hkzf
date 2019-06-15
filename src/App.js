@@ -33,6 +33,7 @@ function App() {
         </ul>
 
         {/* 配置路由 */}
+        {/* Home 组件是父路由的内容 */}
         <Route path="/home" component={Home} />
         <Route path="/citylist" component={CityList} />
       </div>
