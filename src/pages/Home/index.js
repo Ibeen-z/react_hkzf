@@ -5,14 +5,22 @@ import News from '../News'
 // 导入 TabBar
 import { TabBar } from 'antd-mobile'
 
+/* 
+  1 删除前面路由的演示代码。
+  2 修改 TabBar 菜单项文字标题。
+  3 修改 TabBar 菜单文字标题颜色（选中和未选中）。
+  4 使用字体图标，修改 TabBar 菜单的图标。
+  5 修改 TabBar 菜单项的图标大小。
+  6 调整 TabBar 菜单的位置，让其固定在最底部。
+*/
+
+// 导入组件自己的样式文件
+import './index.css'
+
 export default class Home extends React.Component {
   state = {
     // 默认选中的TabBar菜单项
-    selectedTab: 'redTab',
-    // 用于控制TabBar的展示和隐藏。这个值应该是false，也就是不隐藏！
-    hidden: false,
-    // 全屏
-    fullScreen: false
+    selectedTab: 'redTab'
   }
 
   // 渲染每个 TabBar.Item 的内容
@@ -61,147 +69,71 @@ export default class Home extends React.Component {
 
   render() {
     return (
-      <div style={{ backgroundColor: 'skyblue', padding: 10 }}>
-        首页
+      <div className="home">
         {/* 2.3 渲染子路由 */}
         <Route path="/home/news" component={News} />
         {/* TabBar */}
-        <div
-          style={
-            this.state.fullScreen
-              ? { position: 'fixed', height: '100%', width: '100%', top: 0 }
-              : { height: 400 }
-          }
-        >
-          <TabBar
-            unselectedTintColor="#949494"
-            tintColor="#33A3F4"
-            barTintColor="white"
-            hidden={this.state.hidden}
+
+        <TabBar tintColor="#21b97a" barTintColor="white">
+          <TabBar.Item
+            title="首页"
+            key="Life"
+            icon={<i className="iconfont icon-ind" />}
+            selectedIcon={<i className="iconfont icon-ind" />}
+            selected={this.state.selectedTab === 'blueTab'}
+            onPress={() => {
+              this.setState({
+                selectedTab: 'blueTab'
+              })
+            }}
+            data-seed="logId"
           >
-            <TabBar.Item
-              title="Life"
-              key="Life"
-              icon={
-                <div
-                  style={{
-                    width: '22px',
-                    height: '22px',
-                    background:
-                      'url(https://zos.alipayobjects.com/rmsportal/sifuoDUQdAFKAVcFGROC.svg) center center /  21px 21px no-repeat'
-                  }}
-                />
-              }
-              selectedIcon={
-                <div
-                  style={{
-                    width: '22px',
-                    height: '22px',
-                    background:
-                      'url(https://zos.alipayobjects.com/rmsportal/iSrlOTqrKddqbOmlvUfq.svg) center center /  21px 21px no-repeat'
-                  }}
-                />
-              }
-              selected={this.state.selectedTab === 'blueTab'}
-              badge={1}
-              onPress={() => {
-                this.setState({
-                  selectedTab: 'blueTab'
-                })
-              }}
-              data-seed="logId"
-            >
-              {this.renderContent('Life')}
-            </TabBar.Item>
-            <TabBar.Item
-              icon={
-                <div
-                  style={{
-                    width: '22px',
-                    height: '22px',
-                    background:
-                      'url(https://gw.alipayobjects.com/zos/rmsportal/BTSsmHkPsQSPTktcXyTV.svg) center center /  21px 21px no-repeat'
-                  }}
-                />
-              }
-              selectedIcon={
-                <div
-                  style={{
-                    width: '22px',
-                    height: '22px',
-                    background:
-                      'url(https://gw.alipayobjects.com/zos/rmsportal/ekLecvKBnRazVLXbWOnE.svg) center center /  21px 21px no-repeat'
-                  }}
-                />
-              }
-              title="Koubei"
-              key="Koubei"
-              badge={'new'}
-              selected={this.state.selectedTab === 'redTab'}
-              onPress={() => {
-                this.setState({
-                  selectedTab: 'redTab'
-                })
-              }}
-              data-seed="logId1"
-            >
-              {this.renderContent('Koubei')}
-            </TabBar.Item>
-            <TabBar.Item
-              icon={
-                <div
-                  style={{
-                    width: '22px',
-                    height: '22px',
-                    background:
-                      'url(https://zos.alipayobjects.com/rmsportal/psUFoAMjkCcjqtUCNPxB.svg) center center /  21px 21px no-repeat'
-                  }}
-                />
-              }
-              selectedIcon={
-                <div
-                  style={{
-                    width: '22px',
-                    height: '22px',
-                    background:
-                      'url(https://zos.alipayobjects.com/rmsportal/IIRLrXXrFAhXVdhMWgUI.svg) center center /  21px 21px no-repeat'
-                  }}
-                />
-              }
-              title="Friend"
-              key="Friend"
-              dot
-              selected={this.state.selectedTab === 'greenTab'}
-              onPress={() => {
-                this.setState({
-                  selectedTab: 'greenTab'
-                })
-              }}
-            >
-              {this.renderContent('Friend')}
-            </TabBar.Item>
-            <TabBar.Item
-              icon={{
-                uri:
-                  'https://zos.alipayobjects.com/rmsportal/asJMfBrNqpMMlVpeInPQ.svg'
-              }}
-              selectedIcon={{
-                uri:
-                  'https://zos.alipayobjects.com/rmsportal/gjpzzcrPMkhfEqgbYvmN.svg'
-              }}
-              title="My"
-              key="my"
-              selected={this.state.selectedTab === 'yellowTab'}
-              onPress={() => {
-                this.setState({
-                  selectedTab: 'yellowTab'
-                })
-              }}
-            >
-              {this.renderContent('My')}
-            </TabBar.Item>
-          </TabBar>
-        </div>
+            {this.renderContent('Life')}
+          </TabBar.Item>
+          <TabBar.Item
+            icon={<i className="iconfont icon-findHouse" />}
+            selectedIcon={<i className="iconfont icon-findHouse" />}
+            title="找房"
+            key="Koubei"
+            selected={this.state.selectedTab === 'redTab'}
+            onPress={() => {
+              this.setState({
+                selectedTab: 'redTab'
+              })
+            }}
+            data-seed="logId1"
+          >
+            {this.renderContent('Koubei')}
+          </TabBar.Item>
+          <TabBar.Item
+            icon={<i className="iconfont icon-infom" />}
+            selectedIcon={<i className="iconfont icon-infom" />}
+            title="资讯"
+            key="Friend"
+            selected={this.state.selectedTab === 'greenTab'}
+            onPress={() => {
+              this.setState({
+                selectedTab: 'greenTab'
+              })
+            }}
+          >
+            {this.renderContent('Friend')}
+          </TabBar.Item>
+          <TabBar.Item
+            icon={<i className="iconfont icon-my" />}
+            selectedIcon={<i className="iconfont icon-my" />}
+            title="我的"
+            key="my"
+            selected={this.state.selectedTab === 'yellowTab'}
+            onPress={() => {
+              this.setState({
+                selectedTab: 'yellowTab'
+              })
+            }}
+          >
+            {this.renderContent('My')}
+          </TabBar.Item>
+        </TabBar>
       </div>
     )
   }
