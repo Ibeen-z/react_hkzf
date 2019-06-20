@@ -1,21 +1,14 @@
 import React from 'react'
+// 导入路由
 import { Route } from 'react-router-dom'
+// 导入 TabBar
+import { TabBar } from 'antd-mobile'
 
+// 导入TabBar菜单的组件
 import News from '../News'
 import Index from '../Index'
 import HouseList from '../HouseList'
 import Profile from '../Profile'
-
-// 导入 TabBar
-import { TabBar } from 'antd-mobile'
-
-/* 
-  1 根据 TabBar 组件 文档 设置不渲染内容部分（只保留菜单项，不显示内容）。
-  2 给 TabBar.Item 绑定点击事件。
-  3 在点击事件中调用 history.push() 实现路由切换。
-  4 创建 TabBar 组件菜单项对应的其他 3 个组件，并在 Home 组件中配置路由信息。
-  5 给菜单项添加 selected 属性，设置当前匹配的菜单项高亮。
-*/
 
 // 导入组件自己的样式文件
 import './index.css'
@@ -25,7 +18,7 @@ const tabItems = [
   {
     title: '首页',
     icon: 'icon-ind',
-    path: '/home/index'
+    path: '/home'
   },
   {
     title: '找房',
@@ -77,7 +70,7 @@ export default class Home extends React.Component {
       <div className="home">
         {/* 2.3 渲染子路由 */}
         <Route path="/home/news" component={News} />
-        <Route path="/home/index" component={Index} />
+        <Route exact path="/home" component={Index} />
         <Route path="/home/list" component={HouseList} />
         <Route path="/home/profile" component={Profile} />
         {/* TabBar */}
