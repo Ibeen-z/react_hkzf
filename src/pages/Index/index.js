@@ -13,7 +13,7 @@ import Nav3 from '../../assets/images/nav-3.png'
 import Nav4 from '../../assets/images/nav-4.png'
 
 // 导入样式文件
-import './index.css'
+import './index.scss'
 
 // 导航菜单数据
 const navs = [
@@ -42,19 +42,6 @@ const navs = [
     path: '/rent'
   }
 ]
-
-/* 
-  轮播图存在的两个问题：
-  1 不会自动播放
-  2 从其他路由返回的时候，高度不够
-
-  原因： 轮播图数据是动态加载的，加载完成前后轮播图数量不一致
-
-  如何解决？？？
-    1 在state中添加表示轮播图加载完成的数据
-    2 在 轮播图数据加载完成时，修改该数据状态值为 true
-    3 只有在轮播图数据加载完成的情况下，才渲染 轮播图组件
-*/
 
 export default class Index extends React.Component {
   state = {
