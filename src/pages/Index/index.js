@@ -1,7 +1,7 @@
 import React from 'react'
 
 // 导入组件
-import { Carousel, Flex } from 'antd-mobile'
+import { Carousel, Flex, Grid } from 'antd-mobile'
 
 // 导入axios
 import axios from 'axios'
@@ -47,7 +47,10 @@ export default class Index extends React.Component {
   state = {
     // 轮播图状态数据
     swipers: [],
-    isSwiperLoaded: false
+    isSwiperLoaded: false,
+
+    // 租房小组数据
+    groups: []
   }
 
   // 获取轮播图数据的方法
@@ -59,8 +62,23 @@ export default class Index extends React.Component {
     })
   }
 
+  // 获取租房小组数据的方法
+  async getGroups() {
+    const res = await axios.get('http://localhost:8080/home/groups', {
+      params: {
+        area: 'AREA%7C88cff55c-aaa4-e2e0'
+      }
+    })
+
+    // console.log(res)
+    this.setState({
+      groups: res.data.body
+    })
+  }
+
   componentDidMount() {
     this.getSwipers()
+    this.getGroups()
   }
 
   // 渲染轮播图结构
@@ -113,6 +131,41 @@ export default class Index extends React.Component {
 
         {/* 导航菜单 */}
         <Flex className="nav">{this.renderNavs()}</Flex>
+
+        {/* 租房小组 */}
+        <div className="group">
+          <h3 className="group-title">
+            租房小组 <span className="more">更多</span>
+          </h3>
+
+          {/* 宫格组件 */}
+          <Grid
+            data={this.state.groups}
+            columnNum={2}
+            square={false}
+            hasLine={false}
+            renderItem={item => (
+              <Flex className="group-item" justify="around" key={item.id}>
+                <div className="desc">
+                  <p className="title">{item.title}</p>
+                  <span className="info">{item.desc}</span>
+                </div>
+                <img src={`http://localhost:8080${item.imgSrc}`} alt="" />
+              </Flex>
+            )}
+          />
+        </div>
+
+        {/* <Flex className="group-item" justify="around">
+          <div className="desc">
+            <p className="title">家住回龙观</p>
+            <span className="info">归属的感觉</span>
+          </div>
+          <img
+            src="http://localhost:3000/static/media/group-1.263b84b0.png"
+            alt=""
+          />
+        </Flex> */}
       </div>
     )
   }
