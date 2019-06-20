@@ -1,7 +1,7 @@
 import React from 'react'
 
 // 导入组件
-import { Carousel, Flex, Grid } from 'antd-mobile'
+import { Carousel, Flex, Grid, WingBlank } from 'antd-mobile'
 
 // 导入axios
 import axios from 'axios'
@@ -50,7 +50,9 @@ export default class Index extends React.Component {
     isSwiperLoaded: false,
 
     // 租房小组数据
-    groups: []
+    groups: [],
+    // 最新资讯
+    news: []
   }
 
   // 获取轮播图数据的方法
@@ -76,9 +78,21 @@ export default class Index extends React.Component {
     })
   }
 
+  // 获取最新资讯
+  async getNews() {
+    const res = await axios.get(
+      'http://localhost:8080/home/news?area=AREA%7C88cff55c-aaa4-e2e0'
+    )
+
+    this.setState({
+      news: res.data.body
+    })
+  }
+
   componentDidMount() {
     this.getSwipers()
     this.getGroups()
+    this.getNews()
   }
 
   // 渲染轮播图结构
@@ -112,6 +126,28 @@ export default class Index extends React.Component {
         <img src={item.img} alt="" />
         <h2>{item.title}</h2>
       </Flex.Item>
+    ))
+  }
+
+  // 渲染最新资讯
+  renderNews() {
+    return this.state.news.map(item => (
+      <div className="news-item" key={item.id}>
+        <div className="imgwrap">
+          <img
+            className="img"
+            src={`http://localhost:8080${item.imgSrc}`}
+            alt=""
+          />
+        </div>
+        <Flex className="content" direction="column" justify="between">
+          <h3 className="title">{item.title}</h3>
+          <Flex className="info" justify="between">
+            <span>{item.from}</span>
+            <span>{item.date}</span>
+          </Flex>
+        </Flex>
+      </div>
     ))
   }
 
@@ -156,16 +192,11 @@ export default class Index extends React.Component {
           />
         </div>
 
-        {/* <Flex className="group-item" justify="around">
-          <div className="desc">
-            <p className="title">家住回龙观</p>
-            <span className="info">归属的感觉</span>
-          </div>
-          <img
-            src="http://localhost:3000/static/media/group-1.263b84b0.png"
-            alt=""
-          />
-        </Flex> */}
+        {/* 最新资讯 */}
+        <div className="news">
+          <h3 className="group-title">最新资讯</h3>
+          <WingBlank size="md">{this.renderNews()}</WingBlank>
+        </div>
       </div>
     )
   }
