@@ -43,17 +43,32 @@ const navs = [
   }
 ]
 
+/* 
+  轮播图存在的两个问题：
+  1 不会自动播放
+  2 从其他路由返回的时候，高度不够
+
+  原因： 轮播图数据是动态加载的，加载完成前后轮播图数量不一致
+
+  如何解决？？？
+    1 在state中添加表示轮播图加载完成的数据
+    2 在 轮播图数据加载完成时，修改该数据状态值为 true
+    3 只有在轮播图数据加载完成的情况下，才渲染 轮播图组件
+*/
+
 export default class Index extends React.Component {
   state = {
     // 轮播图状态数据
-    swipers: []
+    swipers: [],
+    isSwiperLoaded: false
   }
 
   // 获取轮播图数据的方法
   async getSwipers() {
     const res = await axios.get('http://localhost:8080/home/swiper')
     this.setState({
-      swipers: res.data.body
+      swipers: res.data.body,
+      isSwiperLoaded: true
     })
   }
 
@@ -99,9 +114,15 @@ export default class Index extends React.Component {
     return (
       <div className="index">
         {/* 轮播图 */}
-        <Carousel autoplay infinite autoplayInterval={5000}>
-          {this.renderSwipers()}
-        </Carousel>
+        <div className="swiper">
+          {this.state.isSwiperLoaded ? (
+            <Carousel autoplay infinite autoplayInterval={5000}>
+              {this.renderSwipers()}
+            </Carousel>
+          ) : (
+            ''
+          )}
+        </div>
 
         {/* 导航菜单 */}
         <Flex className="nav">{this.renderNavs()}</Flex>
