@@ -43,6 +43,18 @@ const navs = [
   }
 ]
 
+// 获取地理位置信息
+// navigator.geolocation.getCurrentPosition(position => {
+//   console.log('当前位置信息：', position)
+// })
+
+/* 
+  1 打开百度地图JS API 定位文档 。
+  2 通过 IP 定位获取到当前城市名称。
+  3 调用我们服务器的接口，换取项目中的城市信息（有房源的城市的名称和id）。
+  4 将接口返回的城市信息展示在顶部导航栏中。
+*/
+
 export default class Index extends React.Component {
   state = {
     // 轮播图状态数据
@@ -52,7 +64,9 @@ export default class Index extends React.Component {
     // 租房小组数据
     groups: [],
     // 最新资讯
-    news: []
+    news: [],
+    // 当前城市名称
+    curCityName: '上海'
   }
 
   // 获取轮播图数据的方法
@@ -93,6 +107,19 @@ export default class Index extends React.Component {
     this.getSwipers()
     this.getGroups()
     this.getNews()
+
+    // 2 通过 IP 定位获取到当前城市名称。
+    const curCity = new window.BMap.LocalCity()
+    curCity.get(async res => {
+      // console.log('当前城市信息：', res)
+      const result = await axios.get(
+        `http://localhost:8080/area/info?name=${res.name}`
+      )
+      // console.log(result)
+      this.setState({
+        curCityName: result.data.body.label
+      })
+    })
   }
 
   // 渲染轮播图结构
@@ -173,7 +200,7 @@ export default class Index extends React.Component {
                 className="location"
                 onClick={() => this.props.history.push('/citylist')}
               >
-                <span className="name">上海</span>
+                <span className="name">{this.state.curCityName}</span>
                 <i className="iconfont icon-arrow" />
               </div>
 

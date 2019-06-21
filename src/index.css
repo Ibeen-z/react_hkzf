@@ -1,6 +1,7 @@
 html,
 body {
-  height: 100%;
+  margin: 0;
+  padding: 0;
   font-family: 'Microsoft YaHei';
   color: #333;
   background-color: #fff;
@@ -16,4 +17,11 @@ h2,
 h3,
 p {
   margin: 0;
+}
+
+html,
+body,
+#root,
+.App {
+  height: 100%;
 }
