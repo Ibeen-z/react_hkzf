@@ -4,7 +4,7 @@ import axios from 'axios'
 import { NavBar } from 'antd-mobile'
 
 // 导入 List 组件
-import { List } from 'react-virtualized'
+import { List, AutoSizer } from 'react-virtualized'
 
 import './index.scss'
 // 导入 utils 中获取当前定位城市的方法
@@ -41,11 +41,12 @@ const formatCityData = list => {
 }
 
 /* 
-  1 安装：yarn add react-virtualized 。
-  2 在项目入口文件 index.js 中导入样式文件（只导入一次即可）。
-  3 打开文档，点击 List 组件，进入 List 的文档中。
-  4 翻到文档最底部，将示例代码拷贝到项目中。
-  5 分析示例代码。
+  1 打开 AutoSizer 高阶组件的文档。
+  2 导入 AutoSizer 组件。
+  3 通过 render-props 模式，获取到 AutoSizer 组件暴露的 width 和 height 属性。
+  4 设置 List 组件的 width 和 height 属性。
+  5 设置城市选择页面根元素高度 100% ，让 List 组件占满整个页面。
+  6 调整样式，让页面不要出现全局滚动条，避免顶部导航栏滚动。
 */
 
 // 列表数据的数据源
@@ -66,6 +67,11 @@ function rowRenderer({
     </div>
   )
 }
+
+// 索引（A、B等）的高度
+const TITLE_HEIGHT = 36
+// 每个城市名称的高度
+const NAME_HEIGHT = 50
 
 export default class CityList extends React.Component {
   componentDidMount() {
@@ -104,13 +110,17 @@ export default class CityList extends React.Component {
         </NavBar>
 
         {/* 城市列表 */}
-        <List
-          width={300}
-          height={300}
-          rowCount={list.length}
-          rowHeight={50}
-          rowRenderer={rowRenderer}
-        />
+        <AutoSizer>
+          {({ width, height }) => (
+            <List
+              width={width}
+              height={height}
+              rowCount={list.length}
+              rowHeight={50}
+              rowRenderer={rowRenderer}
+            />
+          )}
+        </AutoSizer>
       </div>
     )
   }
