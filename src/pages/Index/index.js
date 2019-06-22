@@ -15,6 +15,9 @@ import Nav4 from '../../assets/images/nav-4.png'
 // 导入样式文件
 import './index.scss'
 
+// 导入utils中获取定位城市的方法
+import { getCurrentCity } from '../../utils'
+
 // 导航菜单数据
 const navs = [
   {
@@ -103,22 +106,27 @@ export default class Index extends React.Component {
     })
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     this.getSwipers()
     this.getGroups()
     this.getNews()
 
     // 2 通过 IP 定位获取到当前城市名称。
-    const curCity = new window.BMap.LocalCity()
-    curCity.get(async res => {
-      // console.log('当前城市信息：', res)
-      const result = await axios.get(
-        `http://localhost:8080/area/info?name=${res.name}`
-      )
-      // console.log(result)
-      this.setState({
-        curCityName: result.data.body.label
-      })
+    // const curCity = new window.BMap.LocalCity()
+    // curCity.get(async res => {
+    //   // console.log('当前城市信息：', res)
+    //   const result = await axios.get(
+    //     `http://localhost:8080/area/info?name=${res.name}`
+    //   )
+    //   // console.log(result)
+    //   this.setState({
+    //     curCityName: result.data.body.label
+    //   })
+    // })
+
+    const curCity = await getCurrentCity()
+    this.setState({
+      curCityName: curCity.label
     })
   }
 
