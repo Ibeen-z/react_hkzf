@@ -41,39 +41,61 @@ const formatCityData = list => {
 }
 
 /* 
-  1 打开 AutoSizer 高阶组件的文档。
-  2 导入 AutoSizer 组件。
-  3 通过 render-props 模式，获取到 AutoSizer 组件暴露的 width 和 height 属性。
-  4 设置 List 组件的 width 和 height 属性。
-  5 设置城市选择页面根元素高度 100% ，让 List 组件占满整个页面。
-  6 调整样式，让页面不要出现全局滚动条，避免顶部导航栏滚动。
+  1 将获取到的 cityList 和 cityIndex  添加为组件的状态数据。
+  2 修改 List 组件的 rowCount 为 cityIndex 的长度。
+  3 将 rowRenderer 函数，添加到组件中，以便在函数中获取到状态数据 cityList 和 cityIndex。
+  4 修改 List 组件的 rowRenderer 为组件中的 rowRenderer 方法。
+  5 修改 rowRenderer 方法中渲染的每行结构和样式。
+  6 修改 List 组件的 rowHeight 为函数，动态计算每一行的高度（因为每一行高度都不相同）。
+  
+  <div key={key} style={style} className="city">
+    <div className="title">S</div>
+    <div className="name">上海</div>
+  </div>
 */
 
 // 列表数据的数据源
-const list = Array(100).fill('react-virtualized')
+// const list = Array(100).fill('react-virtualized')
 
 // 渲染每一行数据的渲染函数
 // 函数的返回值就表示最终渲染在页面中的内容
-function rowRenderer({
-  key, // Unique key within array of rows
-  index, // 索引号
-  isScrolling, // 当前项是否正在滚动中
-  isVisible, // 当前项在 List 中是可见的
-  style // 注意：重点属性，一定要给每一个行数据添加该样式！作用：指定每一行的位置
-}) {
-  return (
-    <div key={key} style={style}>
-      1232 -{list[index]} {index} {isScrolling + ''}
-    </div>
-  )
-}
+// function rowRenderer({
+//   key, // Unique key within array of rows
+//   index, // 索引号
+//   isScrolling, // 当前项是否正在滚动中
+//   isVisible, // 当前项在 List 中是可见的
+//   style // 注意：重点属性，一定要给每一个行数据添加该样式！作用：指定每一行的位置
+// }) {
+//   return (
+//     <div key={key} style={style}>
+//       1232 -{list[index]} {index} {isScrolling + ''}
+//     </div>
+//   )
+// }
 
 // 索引（A、B等）的高度
 const TITLE_HEIGHT = 36
 // 每个城市名称的高度
 const NAME_HEIGHT = 50
 
+// 封装处理字母索引的方法
+const formatCityIndex = letter => {
+  switch (letter) {
+    case '#':
+      return '当前定位'
+    case 'hot':
+      return '热门城市'
+    default:
+      return letter.toUpperCase()
+  }
+}
+
 export default class CityList extends React.Component {
+  state = {
+    cityList: {},
+    cityIndex: []
+  }
+
   componentDidMount() {
     this.getCityList()
   }
@@ -93,7 +115,46 @@ export default class CityList extends React.Component {
     cityList['#'] = [curCity]
     cityIndex.unshift('#')
 
-    console.log(cityList, cityIndex, curCity)
+    // console.log(cityList, cityIndex, curCity)
+    this.setState({
+      cityList,
+      cityIndex
+    })
+  }
+
+  // List组件渲染每一行的方法：
+  rowRenderer = ({
+    key, // Unique key within array of rows
+    index, // 索引号
+    isScrolling, // 当前项是否正在滚动中
+    isVisible, // 当前项在 List 中是可见的
+    style // 注意：重点属性，一定要给每一个行数据添加该样式！作用：指定每一行的位置
+  }) => {
+    // 获取每一行的字母索引
+    const { cityIndex, cityList } = this.state
+    const letter = cityIndex[index]
+
+    // 获取指定字母索引下的城市列表数据
+    // console.log(cityList[letter])
+
+    return (
+      <div key={key} style={style} className="city">
+        <div className="title">{formatCityIndex(letter)}</div>
+        {cityList[letter].map(item => (
+          <div className="name" key={item.value}>
+            {item.label}
+          </div>
+        ))}
+      </div>
+    )
+  }
+
+  // 创建动态计算每一行高度的方法
+  getRowHeight = ({ index }) => {
+    // 索引标题高度 + 城市数量 * 城市名称的高度
+    // TITLE_HEIGHT + cityList[cityIndex[index]].length * NAME_HEIGHT
+    const { cityList, cityIndex } = this.state
+    return TITLE_HEIGHT + cityList[cityIndex[index]].length * NAME_HEIGHT
   }
 
   render() {
@@ -115,9 +176,9 @@ export default class CityList extends React.Component {
             <List
               width={width}
               height={height}
-              rowCount={list.length}
-              rowHeight={50}
-              rowRenderer={rowRenderer}
+              rowCount={this.state.cityIndex.length}
+              rowHeight={this.getRowHeight}
+              rowRenderer={this.rowRenderer}
             />
           )}
         </AutoSizer>
