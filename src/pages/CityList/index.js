@@ -91,15 +91,27 @@ const formatCityIndex = letter => {
 }
 
 export default class CityList extends React.Component {
-  state = {
-    cityList: {},
-    cityIndex: [],
-    // 指定右侧字母索引列表高亮的索引号
-    activeIndex: 0
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      cityList: {},
+      cityIndex: [],
+      // 指定右侧字母索引列表高亮的索引号
+      activeIndex: 0
+    }
+
+    // 创建ref对象
+    this.cityListComponent = React.createRef()
   }
 
-  componentDidMount() {
-    this.getCityList()
+  async componentDidMount() {
+    await this.getCityList()
+
+    // 调用 measureAllRows，提前计算 List 中每一行的高度，实现 scrollToRow 的精确跳转
+    // 注意：调用这个方法的时候，需要保证 List 组件中已经有数据了！如果 List 组件中的数据为空，就会导致调用方法报错！
+    // 解决：只要保证这个方法是在 获取到数据之后 调用的即可。
+    this.cityListComponent.current.measureAllRows()
   }
 
   // 获取城市列表数据的方法
@@ -159,12 +171,32 @@ export default class CityList extends React.Component {
     return TITLE_HEIGHT + cityList[cityIndex[index]].length * NAME_HEIGHT
   }
 
+  /* 
+    1 给索引列表项绑定点击事件。
+    2 在点击事件中，通过 index 获取到当前项索引号。
+    3 调用 List 组件的 scrollToRow 方法，让 List 组件滚动到指定行。
+
+    3.1 在 constructor 中，调用 React.createRef() 创建 ref 对象。
+    3.2 将创建好的 ref 对象，添加为 List 组件的 ref 属性。
+    3.3 通过 ref 的 current 属性，获取到组件实例，再调用组件的 scrollToRow 方法。
+
+    4 设置 List 组件的 scrollToAlignment 配置项值为 start，保证被点击行出现在页面顶部。
+    5 对于点击索引无法正确定位的问题，调用 List 组件的 measureAllRows 方法，提前计算高度来解决。
+  */
+
   // 封装渲染右侧索引列表的方法
   renderCityIndex() {
     // 获取到 cityIndex，并遍历其，实现渲染
     const { cityIndex, activeIndex } = this.state
     return cityIndex.map((item, index) => (
-      <li className="city-index-item" key={item}>
+      <li
+        className="city-index-item"
+        key={item}
+        onClick={() => {
+          // console.log('当前索引号：', index)
+          this.cityListComponent.current.scrollToRow(index)
+        }}
+      >
         <span className={activeIndex === index ? 'index-active' : ''}>
           {item === 'hot' ? '热' : item.toUpperCase()}
         </span>
@@ -206,12 +238,14 @@ export default class CityList extends React.Component {
         <AutoSizer>
           {({ width, height }) => (
             <List
+              ref={this.cityListComponent}
               width={width}
               height={height}
               rowCount={this.state.cityIndex.length}
               rowHeight={this.getRowHeight}
               rowRenderer={this.rowRenderer}
               onRowsRendered={this.onRowsRendered}
+              scrollToAlignment="start"
             />
           )}
         </AutoSizer>
