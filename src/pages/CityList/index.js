@@ -172,6 +172,23 @@ export default class CityList extends React.Component {
     ))
   }
 
+  /* 
+    1 给 List 组件添加 onRowsRendered 配置项，用于获取当前列表渲染的行信息。
+    2 通过参数 startIndex 获取到，起始行索引（也就是城市列表可视区最顶部一行的索引号）。
+    3 判断 startIndex 和 activeIndex 是否相同（判断的目的是为了提升性能，避免不必要的 state 更新）。
+    4 当 startIndex 和 activeIndex 不同时，更新状态 activeIndex 为 startIndex 的值。
+  */
+
+  // 用于获取List组件中渲染行的信息
+  onRowsRendered = ({ startIndex }) => {
+    // console.log('startIndex：', startIndex)
+    if (this.state.activeIndex !== startIndex) {
+      this.setState({
+        activeIndex: startIndex
+      })
+    }
+  }
+
   render() {
     return (
       <div className="citylist">
@@ -194,6 +211,7 @@ export default class CityList extends React.Component {
               rowCount={this.state.cityIndex.length}
               rowHeight={this.getRowHeight}
               rowRenderer={this.rowRenderer}
+              onRowsRendered={this.onRowsRendered}
             />
           )}
         </AutoSizer>
