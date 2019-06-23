@@ -1,7 +1,7 @@
 import React from 'react'
 
 import axios from 'axios'
-import { NavBar } from 'antd-mobile'
+import { NavBar, Toast } from 'antd-mobile'
 
 // 导入 List 组件
 import { List, AutoSizer } from 'react-virtualized'
@@ -90,6 +90,9 @@ const formatCityIndex = letter => {
   }
 }
 
+// 有房源的城市
+const HOUSE_CITY = ['北京', '上海', '广州', '深圳']
+
 export default class CityList extends React.Component {
   constructor(props) {
     super(props)
@@ -136,6 +139,23 @@ export default class CityList extends React.Component {
     })
   }
 
+  /* 
+    1 给城市列表项绑定点击事件。
+    2 判断当前城市是否有房源数据（只有北/上/广/深四个城市有数据）。
+    3 如果有房源数据，则保存当前城市数据到本地缓存中，并返回上一页。
+    4 如果没有房源数据，则提示用户：该城市暂无房源数据，不执行任何操作。
+  */
+
+  changeCity({ label, value }) {
+    if (HOUSE_CITY.indexOf(label) > -1) {
+      // 有
+      localStorage.setItem('hkzf_city', JSON.stringify({ label, value }))
+      this.props.history.go(-1)
+    } else {
+      Toast.info('该城市暂无房源数据', 1, null, false)
+    }
+  }
+
   // List组件渲染每一行的方法：
   rowRenderer = ({
     key, // Unique key within array of rows
@@ -155,7 +175,11 @@ export default class CityList extends React.Component {
       <div key={key} style={style} className="city">
         <div className="title">{formatCityIndex(letter)}</div>
         {cityList[letter].map(item => (
-          <div className="name" key={item.value}>
+          <div
+            className="name"
+            key={item.value}
+            onClick={() => this.changeCity(item)}
+          >
             {item.label}
           </div>
         ))}
