@@ -5,6 +5,9 @@ import { NavBar } from 'antd-mobile'
 // 导入 withRouter 高阶组件
 import { withRouter } from 'react-router-dom'
 
+// 导入 props 校验的包
+import PropTypes from 'prop-types'
+
 // 导入样式
 import './index.scss'
 
@@ -34,6 +37,12 @@ function NavHeader({ children, history, onLeftClick }) {
       {children}
     </NavBar>
   )
+}
+
+// 添加props校验
+NavHeader.propTypes = {
+  children: PropTypes.string.isRequired,
+  onLeftClick: PropTypes.func
 }
 
 // withRouter(NavHeader) 函数的返回值也是一个组件
