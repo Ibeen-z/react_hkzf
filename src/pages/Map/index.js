@@ -1,5 +1,8 @@
 import React from 'react'
 
+// 导入axios
+import axios from 'axios'
+
 // 导入封装好的 NavHeader 组件
 import NavHeader from '../../components/NavHeader'
 
@@ -30,7 +33,7 @@ export default class Map extends React.Component {
   initMap() {
     // 获取当前定位城市
     const { label, value } = JSON.parse(localStorage.getItem('hkzf_city'))
-    console.log(label, value)
+    // console.log(label, value)
 
     // 初始化地图实例
     const map = new BMap.Map('container')
@@ -39,7 +42,7 @@ export default class Map extends React.Component {
     // 将地址解析结果显示在地图上，并调整地图视野
     myGeo.getPoint(
       label,
-      point => {
+      async point => {
         if (point) {
           //  初始化地图
           map.centerAndZoom(point, 11)
@@ -48,41 +51,65 @@ export default class Map extends React.Component {
           map.addControl(new BMap.ScaleControl())
 
           /* 
-            1 调用 Label 的 setContent() 方法，传入 HTML 结构，修改 HTML 内容的样式。
-            2 调用 setStyle() 修改覆盖物样式。
-            3 给文本覆盖物添加单击事件。
-
-            <div class="${styles.bubble}">
-              <p class="${styles.name}">${name}</p>
-              <p>${num}套</p>
-            </div>
+            1 获取房源数据。
+            2 遍历数据，创建覆盖物，给每个覆盖物添加唯一标识（后面要用）。
+            3 给覆盖物添加单击事件。
+            4 在单击事件中，获取到当前单击项的唯一标识。
+            5 放大地图（级别为13），调用 clearOverlays() 方法清除当前覆盖物。
           */
-          const opts = {
-            position: point,
-            offset: new BMap.Size(-35, -35)
-          }
+          const res = await axios.get(
+            `http://localhost:8080/area/map?id=${value}`
+          )
+          console.log('房源数据：', res)
+          res.data.body.forEach(item => {
+            // 为每一条数据创建覆盖物
+            const {
+              coord: { longitude, latitude },
+              label: areaName,
+              count,
+              value
+            } = item
+            // 创建覆盖物
+            const areaPoint = new BMap.Point(longitude, latitude)
 
-          // 说明：设置 setContent 后，第一个参数中设置的文本内容就失效了，因此，直接清空即可
-          const label = new BMap.Label('', opts)
+            const label = new BMap.Label('', {
+              position: areaPoint,
+              offset: new BMap.Size(-35, -35)
+            })
 
-          // 设置房源覆盖物内容
-          label.setContent(`
-            <div class="${styles.bubble}">
-              <p class="${styles.name}">浦东</p>
-              <p>99套</p>
-            </div>
-          `)
+            // 给 label 对象添加一个唯一标识
+            label.id = value
 
-          // 设置样式
-          label.setStyle(labelStyle)
+            // 设置房源覆盖物内容
+            label.setContent(`
+              <div class="${styles.bubble}">
+                <p class="${styles.name}">${areaName}</p>
+                <p>${count}套</p>
+              </div>
+            `)
 
-          // 添加单击事件
-          label.addEventListener('click', () => {
-            console.log('房源覆盖物被点击了')
+            // 设置样式
+            label.setStyle(labelStyle)
+
+            // 添加单击事件
+            label.addEventListener('click', () => {
+              console.log('房源覆盖物被点击了', label.id)
+
+              // 放大地图，以当前点击的覆盖物为中心放大地图
+              // 第一个参数：坐标对象
+              // 第二个参数：放大级别
+              map.centerAndZoom(areaPoint, 13)
+
+              // 解决清除覆盖物时，百度地图API的JS文件自身报错的问题
+              setTimeout(() => {
+                // 清除当前覆盖物信息
+                map.clearOverlays()
+              }, 0)
+            })
+
+            // 添加覆盖物到地图中
+            map.addOverlay(label)
           })
-
-          // 添加覆盖物到地图中
-          map.addOverlay(label)
         }
       },
       label
