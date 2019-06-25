@@ -1,7 +1,7 @@
 import React from 'react'
 
 import axios from 'axios'
-import { NavBar, Toast } from 'antd-mobile'
+import { Toast } from 'antd-mobile'
 
 // 导入 List 组件
 import { List, AutoSizer } from 'react-virtualized'
@@ -9,7 +9,14 @@ import { List, AutoSizer } from 'react-virtualized'
 // 导入 utils 中获取当前定位城市的方法
 import { getCurrentCity } from '../../utils'
 
+// 导入 NavHeader 组件
+import NavHeader from '../../components/NavHeader'
+
 import './index.scss'
+
+// 导入 CSSModules 的样式文件
+import styles from './index.module.css'
+// console.log(styles)
 
 // 数据格式化的方法
 // list: [{}, {}]
@@ -188,14 +195,7 @@ export default class CityList extends React.Component {
     return (
       <div className="citylist">
         {/* 顶部导航栏 */}
-        <NavBar
-          className="navbar"
-          mode="light"
-          icon={<i className="iconfont icon-back" />}
-          onLeftClick={() => this.props.history.go(-1)}
-        >
-          城市选择
-        </NavBar>
+        <NavHeader>城市选择</NavHeader>
 
         {/* 城市列表 */}
         <AutoSizer>
@@ -215,6 +215,9 @@ export default class CityList extends React.Component {
 
         {/* 右侧索引列表 */}
         <ul className="city-index">{this.renderCityIndex()}</ul>
+
+        {/* <div className="test">测试样式覆盖问题</div> */}
+        <div className={styles.test}>测试样式覆盖问题</div>
       </div>
     )
   }

@@ -6,6 +6,8 @@ import NavHeader from '../../components/NavHeader'
 // 导入样式
 import './index.scss'
 
+import styles from './index.module.css'
+
 export default class Map extends React.Component {
   componentDidMount() {
     // 初始化地图实例
@@ -32,6 +34,8 @@ export default class Map extends React.Component {
   render() {
     return (
       <div className="map">
+        <div className={styles.test}>测试样式覆盖问题</div>
+
         {/* 顶部导航栏组件 */}
         <NavHeader>地图找房</NavHeader>
         {/* 地图容器元素 */}

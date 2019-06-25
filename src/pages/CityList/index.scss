@@ -4,13 +4,8 @@
 
   // 顶部导航栏
   .navbar {
+    // background-color: skyblue;
     margin-top: -45px;
-    color: #333;
-    background-color: #f6f5f6;
-
-    .am-navbar-title {
-      color: #333;
-    }
   }
 
   // 城市列表
@@ -62,3 +57,9 @@
     }
   }
 }
+
+// 测试样式：
+// .test {
+//   color: red;
+//   font-size: 20px;
+// }
