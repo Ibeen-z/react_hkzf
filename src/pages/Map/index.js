@@ -37,6 +37,8 @@ export default class Map extends React.Component {
 
     // 初始化地图实例
     const map = new BMap.Map('container')
+    // 作用：能够在其他方法中通过 this 来获取到地图对象
+    this.map = map
     // 创建地址解析器实例
     const myGeo = new BMap.Geocoder()
     // 将地址解析结果显示在地图上，并调整地图视野
@@ -50,17 +52,14 @@ export default class Map extends React.Component {
           map.addControl(new BMap.NavigationControl())
           map.addControl(new BMap.ScaleControl())
 
+          // 调用 renderOverlays 方法
+          this.renderOverlays(value)
           /* 
-            1 获取房源数据。
-            2 遍历数据，创建覆盖物，给每个覆盖物添加唯一标识（后面要用）。
-            3 给覆盖物添加单击事件。
-            4 在单击事件中，获取到当前单击项的唯一标识。
-            5 放大地图（级别为13），调用 clearOverlays() 方法清除当前覆盖物。
+            渲染所有区覆盖物
           */
-          const res = await axios.get(
+          /* const res = await axios.get(
             `http://localhost:8080/area/map?id=${value}`
           )
-          console.log('房源数据：', res)
           res.data.body.forEach(item => {
             // 为每一条数据创建覆盖物
             const {
@@ -69,9 +68,10 @@ export default class Map extends React.Component {
               count,
               value
             } = item
-            // 创建覆盖物
-            const areaPoint = new BMap.Point(longitude, latitude)
 
+            // 创建坐标对象
+            const areaPoint = new BMap.Point(longitude, latitude)
+            // 创建覆盖物
             const label = new BMap.Label('', {
               position: areaPoint,
               offset: new BMap.Size(-35, -35)
@@ -96,8 +96,6 @@ export default class Map extends React.Component {
               console.log('房源覆盖物被点击了', label.id)
 
               // 放大地图，以当前点击的覆盖物为中心放大地图
-              // 第一个参数：坐标对象
-              // 第二个参数：放大级别
               map.centerAndZoom(areaPoint, 13)
 
               // 解决清除覆盖物时，百度地图API的JS文件自身报错的问题
@@ -109,12 +107,69 @@ export default class Map extends React.Component {
 
             // 添加覆盖物到地图中
             map.addOverlay(label)
-          })
+          }) */
         }
       },
       label
     )
   }
+
+  // 渲染覆盖物入口
+  // 1 接收区域 id 参数，获取该区域下的房源数据
+  // 2 获取房源类型以及下级地图缩放级别
+  async renderOverlays(id) {
+    const res = await axios.get(`http://localhost:8080/area/map?id=${id}`)
+    // console.log('renderOverlays 获取到的数据：', res)
+    const data = res.data.body
+
+    // 调用 getTypeAndZoom 方法获取级别和类型
+    const { nextZoom, type } = this.getTypeAndZoom()
+
+    data.forEach(item => {
+      // 创建覆盖物
+      this.createOverlays(item, nextZoom, type)
+    })
+  }
+
+  // 计算要绘制的覆盖物类型和下一个缩放级别
+  // 区   -> 11 ，范围：>=10 <12
+  // 镇   -> 13 ，范围：>=12 <14
+  // 小区 -> 15 ，范围：>=14 <16
+  getTypeAndZoom() {
+    // 调用地图的 getZoom() 方法，来获取当前缩放级别
+    const zoom = this.map.getZoom()
+    let nextZoom, type
+
+    // console.log('当前地图缩放级别：', zoom)
+    if (zoom >= 10 && zoom < 12) {
+      // 区
+      // 下一个缩放级别
+      nextZoom = 13
+      // circle 表示绘制圆形覆盖物（区、镇）
+      type = 'circle'
+    } else if (zoom >= 12 && zoom < 14) {
+      // 镇
+      nextZoom = 15
+      type = 'circle'
+    } else if (zoom >= 14 && zoom < 16) {
+      // 小区
+      type = 'rect'
+    }
+
+    return {
+      nextZoom,
+      type
+    }
+  }
+
+  // 创建覆盖物
+  createOverlays() {}
+
+  // 创建区、镇覆盖物
+  createCircle() {}
+
+  // 创建小区覆盖物
+  createRect() {}
 
   render() {
     return (
