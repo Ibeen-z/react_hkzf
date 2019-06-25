@@ -9,7 +9,8 @@ import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
 
 // 导入样式
-import './index.scss'
+// import './index.scss'
+import styles from './index.module.css'
 
 /* 
   注意：默认情况下，只有路由 Route 直接渲染的组件才能够获取到路由信息（比如：history.go()等）
@@ -29,7 +30,7 @@ function NavHeader({ children, history, onLeftClick }) {
 
   return (
     <NavBar
-      className="navbar"
+      className={styles.navBar}
       mode="light"
       icon={<i className="iconfont icon-back" />}
       onLeftClick={onLeftClick || defaultHandler}

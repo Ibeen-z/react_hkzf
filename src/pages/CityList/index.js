@@ -15,7 +15,7 @@ import NavHeader from '../../components/NavHeader'
 import './index.scss'
 
 // 导入 CSSModules 的样式文件
-import styles from './index.module.css'
+// import styles from './index.module.css'
 // console.log(styles)
 
 // 数据格式化的方法
@@ -215,9 +215,6 @@ export default class CityList extends React.Component {
 
         {/* 右侧索引列表 */}
         <ul className="city-index">{this.renderCityIndex()}</ul>
-
-        {/* <div className="test">测试样式覆盖问题</div> */}
-        <div className={styles.test}>测试样式覆盖问题</div>
       </div>
     )
   }
