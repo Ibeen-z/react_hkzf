@@ -17,23 +17,12 @@ export default class Map extends React.Component {
 
   // 初始化地图
   initMap() {
-    /* 
-      1 获取当前定位城市。
-      2 使用地址解析器解析当前城市坐标。
-      3 调用 centerAndZoom() 方法在地图中展示当前城市，并设置缩放级别为11。
-      4 在地图中展示该城市，并添加比例尺和平移缩放控件。
-    */
-
     // 获取当前定位城市
     const { label, value } = JSON.parse(localStorage.getItem('hkzf_city'))
     console.log(label, value)
 
     // 初始化地图实例
-    // 注意：在 react 脚手架中全局对象需要使用 window 来访问，否则，会造成 ESLint 校验错误
     const map = new BMap.Map('container')
-    // 设置中心点坐标
-    // const point = new window.BMap.Point(116.404, 39.915)
-
     // 创建地址解析器实例
     const myGeo = new BMap.Geocoder()
     // 将地址解析结果显示在地图上，并调整地图视野
@@ -43,18 +32,33 @@ export default class Map extends React.Component {
         if (point) {
           //  初始化地图
           map.centerAndZoom(point, 11)
-          // map.addOverlay(new BMap.Marker(point))
-
           // 添加常用控件
           map.addControl(new BMap.NavigationControl())
           map.addControl(new BMap.ScaleControl())
+
+          /* 
+            1 创建 Label 实例对象。
+            2 调用 setStyle() 方法设置样式。
+            3 在 map 对象上调用 addOverlay() 方法，将文本覆盖物添加到地图中。
+          */
+          const opts = {
+            position: point
+            // offset: new BMap.Size(30, -30)
+          }
+
+          const label = new BMap.Label('文本覆盖物', opts)
+
+          // 设置样式
+          label.setStyle({
+            color: 'green'
+          })
+
+          // 添加覆盖物到地图中
+          map.addOverlay(label)
         }
       },
       label
     )
-
-    // 初始化地图
-    // map.centerAndZoom(point, 15)
   }
 
   render() {
