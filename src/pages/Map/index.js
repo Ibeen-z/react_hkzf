@@ -225,7 +225,43 @@ export default class Map extends React.Component {
   }
 
   // 创建小区覆盖物
-  createRect() {}
+  /* 
+    <div class="${styles.rect}">
+      <span class="${styles.housename}">${name}</span>
+      <span class="${styles.housenum}">${num}套</span>
+      <i class="${styles.arrow}"></i>
+    </div>
+  */
+  createRect(point, name, count, id) {
+    // 创建覆盖物
+    const label = new BMap.Label('', {
+      position: point,
+      offset: new BMap.Size(-50, -28)
+    })
+
+    // 给 label 对象添加一个唯一标识
+    label.id = id
+
+    // 设置房源覆盖物内容
+    label.setContent(`
+      <div class="${styles.rect}">
+        <span class="${styles.housename}">${name}</span>
+        <span class="${styles.housenum}">${count}套</span>
+        <i class="${styles.arrow}"></i>
+      </div>
+    `)
+
+    // 设置样式
+    label.setStyle(labelStyle)
+
+    // 添加单击事件
+    label.addEventListener('click', () => {
+      console.log('小区被点击了')
+    })
+
+    // 添加覆盖物到地图中
+    this.map.addOverlay(label)
+  }
 
   render() {
     return (
