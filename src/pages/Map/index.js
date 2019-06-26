@@ -3,6 +3,7 @@ import React from 'react'
 // 导入axios
 import axios from 'axios'
 import { Link } from 'react-router-dom'
+import { Toast } from 'antd-mobile'
 
 // 导入封装好的 NavHeader 组件
 import NavHeader from '../../components/NavHeader'
@@ -80,17 +81,27 @@ export default class Map extends React.Component {
   // 1 接收区域 id 参数，获取该区域下的房源数据
   // 2 获取房源类型以及下级地图缩放级别
   async renderOverlays(id) {
-    const res = await axios.get(`http://localhost:8080/area/map?id=${id}`)
-    // console.log('renderOverlays 获取到的数据：', res)
-    const data = res.data.body
+    try {
+      // 开启loading
+      Toast.loading('加载中...', 0, null, false)
 
-    // 调用 getTypeAndZoom 方法获取级别和类型
-    const { nextZoom, type } = this.getTypeAndZoom()
+      const res = await axios.get(`http://localhost:8080/area/map?id=${id}`)
+      // 关闭 loading
+      Toast.hide()
 
-    data.forEach(item => {
-      // 创建覆盖物
-      this.createOverlays(item, nextZoom, type)
-    })
+      const data = res.data.body
+
+      // 调用 getTypeAndZoom 方法获取级别和类型
+      const { nextZoom, type } = this.getTypeAndZoom()
+
+      data.forEach(item => {
+        // 创建覆盖物
+        this.createOverlays(item, nextZoom, type)
+      })
+    } catch (e) {
+      // 关闭 loading
+      Toast.hide()
+    }
   }
 
   // 计算要绘制的覆盖物类型和下一个缩放级别
@@ -211,20 +222,7 @@ export default class Map extends React.Component {
 
     // 添加单击事件
     label.addEventListener('click', e => {
-      /* 
-        1 创建 Label 、设置样式、设置 HTML 内容，绑定单击事件。
-        
-        2 在单击事件中，获取该小区的房源数据。
-        3 展示房源列表。
-        4 渲染获取到的房源数据。
-
-        5 调用地图 panBy() 方法，移动地图到中间位置。
-          公式：
-            垂直位移：(window.innerHeight - 330) / 2 - target.clientY
-            水平平移：window.innerWidth / 2 - target.clientX
-        6 监听地图 movestart 事件，在地图移动时隐藏房源列表。
-      */
-
+      // 获取并渲染房源数据
       this.getHousesList(id)
 
       // 获取当前被点击项
@@ -233,7 +231,6 @@ export default class Map extends React.Component {
         window.innerWidth / 2 - target.clientX,
         (window.innerHeight - 330) / 2 - target.clientY
       )
-      // console.log('小区被点击了')
     })
 
     // 添加覆盖物到地图中
@@ -242,14 +239,23 @@ export default class Map extends React.Component {
 
   // 获取小区房源数据
   async getHousesList(id) {
-    const res = await axios.get(`http://localhost:8080/houses?cityId=${id}`)
-    // console.log('小区的房源数据:', res)
-    this.setState({
-      housesList: res.data.body.list,
+    try {
+      // 开启loading
+      Toast.loading('加载中...', 0, null, false)
 
-      // 展示房源列表
-      isShowList: true
-    })
+      const res = await axios.get(`http://localhost:8080/houses?cityId=${id}`)
+      // 关闭 loading
+      Toast.hide()
+
+      this.setState({
+        housesList: res.data.body.list,
+        // 展示房源列表
+        isShowList: true
+      })
+    } catch (e) {
+      // 关闭 loading
+      Toast.hide()
+    }
   }
 
   // 封装渲染房屋列表的方法
