@@ -2,23 +2,21 @@ import React from 'react'
 
 import { Flex } from 'antd-mobile'
 
-// 导入路由的高阶组件
 import { withRouter } from 'react-router-dom'
+
+import PropTypes from 'prop-types'
 
 // 导入样式
 import './index.scss'
 
-function SearchHeader({ history }) {
-  // 从本地存储中获取当前定位城市名称
-  const curCityName = JSON.parse(localStorage.getItem('hkzf_city')).label
-
+function SearchHeader({ history, cityName, className }) {
   return (
-    <Flex className="search-box">
+    <Flex className={['search-box', className || ''].join(' ')}>
       {/* 左侧白色区域 */}
       <Flex className="search">
         {/* 位置 */}
         <div className="location" onClick={() => history.push('/citylist')}>
-          <span className="name">{curCityName}</span>
+          <span className="name">{cityName}</span>
           <i className="iconfont icon-arrow" />
         </div>
 
@@ -32,6 +30,12 @@ function SearchHeader({ history }) {
       <i className="iconfont icon-map" onClick={() => history.push('/map')} />
     </Flex>
   )
+}
+
+// 添加属性校验
+SearchHeader.propTypes = {
+  cityName: PropTypes.string.isRequired,
+  className: PropTypes.string
 }
 
 export default withRouter(SearchHeader)
