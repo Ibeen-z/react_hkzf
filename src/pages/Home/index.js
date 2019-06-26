@@ -4,14 +4,14 @@ import { Route } from 'react-router-dom'
 // 导入 TabBar
 import { TabBar } from 'antd-mobile'
 
+// 导入组件自己的样式文件
+import './index.css'
+
 // 导入TabBar菜单的组件
 import News from '../News'
 import Index from '../Index'
 import HouseList from '../HouseList'
 import Profile from '../Profile'
-
-// 导入组件自己的样式文件
-import './index.css'
 
 // TabBar 数据
 const tabItems = [
