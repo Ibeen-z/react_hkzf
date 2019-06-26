@@ -64,6 +64,16 @@ export default class Map extends React.Component {
       },
       label
     )
+
+    // 给地图绑定移动事件
+    map.addEventListener('movestart', () => {
+      // console.log('movestart')
+      if (this.state.isShowList) {
+        this.setState({
+          isShowList: false
+        })
+      }
+    })
   }
 
   // 渲染覆盖物入口
@@ -200,7 +210,7 @@ export default class Map extends React.Component {
     label.setStyle(labelStyle)
 
     // 添加单击事件
-    label.addEventListener('click', () => {
+    label.addEventListener('click', e => {
       /* 
         1 创建 Label 、设置样式、设置 HTML 内容，绑定单击事件。
         
@@ -209,11 +219,20 @@ export default class Map extends React.Component {
         4 渲染获取到的房源数据。
 
         5 调用地图 panBy() 方法，移动地图到中间位置。
+          公式：
+            垂直位移：(window.innerHeight - 330) / 2 - target.clientY
+            水平平移：window.innerWidth / 2 - target.clientX
         6 监听地图 movestart 事件，在地图移动时隐藏房源列表。
       */
 
       this.getHousesList(id)
 
+      // 获取当前被点击项
+      const target = e.changedTouches[0]
+      this.map.panBy(
+        window.innerWidth / 2 - target.clientX,
+        (window.innerHeight - 330) / 2 - target.clientY
+      )
       // console.log('小区被点击了')
     })
 
