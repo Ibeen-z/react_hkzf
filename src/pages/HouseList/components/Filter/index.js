@@ -26,13 +26,24 @@ const selectedValues = {
   more: []
 }
 
+/* 
+  设置默认选中值：
+
+  1 在 Filter 组件中，提供选中值状态：selectedValues。
+  2 根据 openType 获取到当前类型的选中值（defaultValue），通过 props 传递给 FilterPicker 组件。
+  3 在 FilterPicker 组件中，将 defaultValue 设置为状态 value 的默认值。
+  4 在点击确定按钮后，在父组件中更新当前 type 对应的 selectedValues 状态值。
+*/
+
 export default class Filter extends Component {
   state = {
     titleSelectedStatus,
     // 控制 FilterPicker 或 FilterMore 组件的展示或隐藏
     openType: '',
     // 所有筛选条件数据
-    filtersData: {}
+    filtersData: {},
+    // 筛选条件的选中值
+    selectedValues
   }
 
   componentDidMount() {
@@ -81,7 +92,13 @@ export default class Filter extends Component {
     console.log(type, value)
     // 隐藏对话框
     this.setState({
-      openType: ''
+      openType: '',
+
+      selectedValues: {
+        ...this.state.selectedValues,
+        // 只更新当前 type 对应的选中值
+        [type]: value
+      }
     })
   }
 
@@ -89,7 +106,8 @@ export default class Filter extends Component {
   renderFilterPicker() {
     const {
       openType,
-      filtersData: { area, subway, rentType, price }
+      filtersData: { area, subway, rentType, price },
+      selectedValues
     } = this.state
 
     if (openType !== 'area' && openType !== 'mode' && openType !== 'price') {
@@ -99,6 +117,7 @@ export default class Filter extends Component {
     // 根据 openType 来拿到当前筛选条件数据
     let data = []
     let cols = 3
+    let defaultValue = selectedValues[openType]
     switch (openType) {
       case 'area':
         // 获取到区域数据
@@ -119,11 +138,13 @@ export default class Filter extends Component {
 
     return (
       <FilterPicker
+        key={openType}
         onCancel={this.onCancel}
         onSave={this.onSave}
         data={data}
         cols={cols}
         type={openType}
+        defaultValue={defaultValue}
       />
     )
   }
