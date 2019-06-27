@@ -18,17 +18,13 @@ const titleSelectedStatus = {
   more: false
 }
 
-/* 
-  获取当前筛选条件的数据：
-
-  1 在 Filter 组件中，发送请求，获取所有筛选条件数据。
-  2 将数据保存为状态：filtersData。
-  3 封装渲染 FilterPicker 的方法 renderFilterPicker。
-
-  4 在方法中，根据 openType 的类型，从 filtersData 中获取到需要的数据。
-  5 将数据通过 props 传递给 FilterPicker 组件。
-  6 FilterPicker 组件接收到数据后，将其作为 PickerView 组件的 data （数据源）。
-*/
+// FilterPicker 和 FilterMore 组件的选中值
+const selectedValues = {
+  area: ['area', 'null'],
+  mode: ['null'],
+  price: ['null'],
+  more: []
+}
 
 export default class Filter extends Component {
   state = {
@@ -81,7 +77,8 @@ export default class Filter extends Component {
   }
 
   // 确定（隐藏对话框）
-  onSave = () => {
+  onSave = (type, value) => {
+    console.log(type, value)
     // 隐藏对话框
     this.setState({
       openType: ''
@@ -126,6 +123,7 @@ export default class Filter extends Component {
         onSave={this.onSave}
         data={data}
         cols={cols}
+        type={openType}
       />
     )
   }
