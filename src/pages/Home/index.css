@@ -10,3 +10,11 @@
   position: fixed;
   bottom: 0;
 }
+
+.home .am-tab-bar {
+  height: 100%;
+  overflow: hidden;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}

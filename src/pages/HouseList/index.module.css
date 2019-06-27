@@ -1,3 +1,7 @@
+.root {
+  /* padding-top: 45px; */
+}
+
 /* 顶部导航栏样式 */
 .header {
   height: 45px;
@@ -9,14 +13,6 @@
   font-size: 16px;
   color: #999;
 }
-/* 
-.header :global(.icon-map) {
-  color: #00ae66;
-}
-
-.header :global(.search) {
-  height: 30px;
-} */
 
 /* 覆盖 SearchHeader 组件的样式： */
 .searchHeader {
