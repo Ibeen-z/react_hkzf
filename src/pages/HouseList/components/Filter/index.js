@@ -4,6 +4,9 @@ import FilterTitle from '../FilterTitle'
 import FilterPicker from '../FilterPicker'
 import FilterMore from '../FilterMore'
 
+// 导入自定义的axios
+import { API } from '../../../../utils/api'
+
 import styles from './index.module.css'
 
 // 标题高亮状态
@@ -16,22 +19,39 @@ const titleSelectedStatus = {
 }
 
 /* 
-  控制 FilterPicker 组件的展示和隐藏：
+  获取当前筛选条件的数据：
 
-  1 在 Filter 组件中，提供控制对话框展示或隐藏的状态： openType（表示展示的对话框类型）。
-  2 在 render 中判断 openType 值为 area/mode/price 时，就展示 FilterPicker 组件，以及遮罩层。
-  3 在 onTitleClick 方法中，修改状态 openType 为当前 type，展示对话框。
-  4 在 Filter 组件中，提供 onCancel 方法，作为取消按钮和遮罩层的事件处理程序。
-  5 在 onCancel 方法中，修改状态 openType 为空，隐藏对话框。
-  6 将 onCancel 通过 props 传递给 FilterPicker 组件，在取消按钮的单击事件中调用该方法。
-  7 在 Filter 组件中，提供 onSave 方法，作为确定按钮的事件处理程序，逻辑同上。
+  1 在 Filter 组件中，发送请求，获取所有筛选条件数据。
+  2 将数据保存为状态：filtersData。
+  3 封装渲染 FilterPicker 的方法 renderFilterPicker。
+
+  4 在方法中，根据 openType 的类型，从 filtersData 中获取到需要的数据。
+  5 将数据通过 props 传递给 FilterPicker 组件。
+  6 FilterPicker 组件接收到数据后，将其作为 PickerView 组件的 data （数据源）。
 */
 
 export default class Filter extends Component {
   state = {
     titleSelectedStatus,
     // 控制 FilterPicker 或 FilterMore 组件的展示或隐藏
-    openType: ''
+    openType: '',
+    // 所有筛选条件数据
+    filtersData: {}
+  }
+
+  componentDidMount() {
+    this.getFiltersData()
+  }
+
+  // 封装获取所有筛选条件的方法
+  async getFiltersData() {
+    // 获取当前定位城市id
+    const { value } = JSON.parse(localStorage.getItem('hkzf_city'))
+    const res = await API.get(`/houses/condition?id=${value}`)
+
+    this.setState({
+      filtersData: res.data.body
+    })
   }
 
   // 点击标题菜单实现高亮
@@ -68,6 +88,48 @@ export default class Filter extends Component {
     })
   }
 
+  // 渲染 FilterPicker 组件的方法
+  renderFilterPicker() {
+    const {
+      openType,
+      filtersData: { area, subway, rentType, price }
+    } = this.state
+
+    if (openType !== 'area' && openType !== 'mode' && openType !== 'price') {
+      return null
+    }
+
+    // 根据 openType 来拿到当前筛选条件数据
+    let data = []
+    let cols = 3
+    switch (openType) {
+      case 'area':
+        // 获取到区域数据
+        data = [area, subway]
+        cols = 3
+        break
+      case 'mode':
+        data = rentType
+        cols = 1
+        break
+      case 'price':
+        data = price
+        cols = 1
+        break
+      default:
+        break
+    }
+
+    return (
+      <FilterPicker
+        onCancel={this.onCancel}
+        onSave={this.onSave}
+        data={data}
+        cols={cols}
+      />
+    )
+  }
+
   render() {
     const { titleSelectedStatus, openType } = this.state
 
@@ -86,11 +148,7 @@ export default class Filter extends Component {
           />
 
           {/* 前三个菜单对应的内容： */}
-          {openType === 'area' ||
-          openType === 'mode' ||
-          openType === 'price' ? (
-            <FilterPicker onCancel={this.onCancel} onSave={this.onSave} />
-          ) : null}
+          {this.renderFilterPicker()}
 
           {/* 最后一个菜单对应的内容： */}
           {/* <FilterMore /> */}
