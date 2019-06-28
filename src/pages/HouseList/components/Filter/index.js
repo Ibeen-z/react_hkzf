@@ -52,28 +52,6 @@ export default class Filter extends Component {
     })
   }
 
-  /* 
-    // 高亮：
-    // selectedVal 表示当前 type 的选中值
-    // 
-    // 如果 type 为 area，此时，selectedVal.length !== 2 || selectedVal[0] !== 'area'，就表示已经有选中值
-    // 如果 type 为 mode，此时，selectedVal[0] !== 'null'，就表示已经有选中值
-    // 如果 type 为 price，此时，selectedVal[0] !== 'null'，就表示已经有选中值
-    // 如果 type 为 more, ...
-
-    实现步骤：
-
-    1 在标题点击事件 onTitleClick 方法中，获取到两个状态：标题选中状态对象和筛选条件的选中值对象。
-    2 根据当前标题选中状态对象，获取到一个新的标题选中状态对象（newTitleSelectedStatus）。
-    3 使用 Object.keys() 方法，遍历标题选中状态对象。
-    4 先判断是否为当前标题，如果是，直接让该标题选中状态为 true（高亮）。
-
-    5 否则，分别判断每个标题的选中值是否与默认值相同。
-    6 如果不同，则设置该标题的选中状态为 true。
-    7 如果相同，则设置该标题的选中状态为 false。
-    8 更新状态 titleSelectedStatus 的值为：newTitleSelectedStatus。
-  */
-
   // 点击标题菜单实现高亮
   // 注意：this指向的问题！！！
   // 说明：要实现完整的功能，需要后续的组件配合完成！
@@ -113,27 +91,12 @@ export default class Filter extends Component {
       }
     })
 
-    // console.log('newTitleSelectedStatus：', newTitleSelectedStatus)
-
     this.setState({
       // 展示对话框
       openType: type,
       // 使用新的标题选中状态对象来更新
       titleSelectedStatus: newTitleSelectedStatus
     })
-
-    /* this.setState(prevState => {
-      return {
-        titleSelectedStatus: {
-          // 获取当前对象中所有属性的值
-          ...prevState.titleSelectedStatus,
-          [type]: true
-        },
-
-        // 展示对话框
-        openType: type
-      }
-    }) */
   }
 
   // 取消（隐藏对话框）
@@ -207,14 +170,18 @@ export default class Filter extends Component {
   }
 
   /* 
-    1 封装 renderFilterMore 方法，渲染 FilterMore 组件。
-    2 从 filtersData 中，获取数据（roomType, oriented, floor, characteristic），通过 props 传递给 FilterMore 组件。
-    3 FilterMore 组件中，通过 props 获取到数据，分别将数据传递给 renderFilters 方法。
-    4 在 renderFilters 方法中，通过参数接收数据，遍历数据，渲染标签。
+    设置默认选中值：
+
+    1 在渲染 FilterMore 组件时，从 selectedValues 中，获取到当前选中值 more。
+    2 通过 props 将选中值传递给 FilterMore 组件。
+    3 在 FilterMore 组件中，将获取到的选中值，设置为子组件状态 selectedValues 的默认值。
+    4 给遮罩层绑定单击事件。
+    5 在单击事件中，调用父组件的方法 onCancel 关闭 FilterMore 组件。
   */
   renderFilterMore() {
     const {
       openType,
+      selectedValues,
       filtersData: { roomType, oriented, floor, characteristic }
     } = this.state
     if (openType !== 'more') {
@@ -228,7 +195,17 @@ export default class Filter extends Component {
       characteristic
     }
 
-    return <FilterMore data={data} type={openType} onSave={this.onSave} />
+    const defaultValue = selectedValues.more
+
+    return (
+      <FilterMore
+        data={data}
+        type={openType}
+        onSave={this.onSave}
+        onCancel={this.onCancel}
+        defaultValue={defaultValue}
+      />
+    )
   }
 
   render() {

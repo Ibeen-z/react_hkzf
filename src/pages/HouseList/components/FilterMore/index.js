@@ -17,7 +17,7 @@ import styles from './index.module.css'
 
 export default class FilterMore extends Component {
   state = {
-    selectedValues: []
+    selectedValues: this.props.defaultValue
   }
 
   // 标签点击事件
@@ -75,13 +75,14 @@ export default class FilterMore extends Component {
 
   render() {
     const {
-      data: { roomType, oriented, floor, characteristic }
+      data: { roomType, oriented, floor, characteristic },
+      onCancel
     } = this.props
 
     return (
       <div className={styles.root}>
         {/* 遮罩层 */}
-        <div className={styles.mask} />
+        <div className={styles.mask} onClick={onCancel} />
 
         {/* 条件内容 */}
         <div className={styles.tags}>
