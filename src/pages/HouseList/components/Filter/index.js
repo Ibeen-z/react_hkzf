@@ -26,15 +26,6 @@ const selectedValues = {
   more: []
 }
 
-/* 
-  设置默认选中值：
-
-  1 在 Filter 组件中，提供选中值状态：selectedValues。
-  2 根据 openType 获取到当前类型的选中值（defaultValue），通过 props 传递给 FilterPicker 组件。
-  3 在 FilterPicker 组件中，将 defaultValue 设置为状态 value 的默认值。
-  4 在点击确定按钮后，在父组件中更新当前 type 对应的 selectedValues 状态值。
-*/
-
 export default class Filter extends Component {
   state = {
     titleSelectedStatus,
@@ -61,11 +52,77 @@ export default class Filter extends Component {
     })
   }
 
+  /* 
+    // 高亮：
+    // selectedVal 表示当前 type 的选中值
+    // 
+    // 如果 type 为 area，此时，selectedVal.length !== 2 || selectedVal[0] !== 'area'，就表示已经有选中值
+    // 如果 type 为 mode，此时，selectedVal[0] !== 'null'，就表示已经有选中值
+    // 如果 type 为 price，此时，selectedVal[0] !== 'null'，就表示已经有选中值
+    // 如果 type 为 more, ...
+
+    实现步骤：
+
+    1 在标题点击事件 onTitleClick 方法中，获取到两个状态：标题选中状态对象和筛选条件的选中值对象。
+    2 根据当前标题选中状态对象，获取到一个新的标题选中状态对象（newTitleSelectedStatus）。
+    3 使用 Object.keys() 方法，遍历标题选中状态对象。
+    4 先判断是否为当前标题，如果是，直接让该标题选中状态为 true（高亮）。
+
+    5 否则，分别判断每个标题的选中值是否与默认值相同。
+    6 如果不同，则设置该标题的选中状态为 true。
+    7 如果相同，则设置该标题的选中状态为 false。
+    8 更新状态 titleSelectedStatus 的值为：newTitleSelectedStatus。
+  */
+
   // 点击标题菜单实现高亮
   // 注意：this指向的问题！！！
   // 说明：要实现完整的功能，需要后续的组件配合完成！
   onTitleClick = type => {
-    this.setState(prevState => {
+    const { titleSelectedStatus, selectedValues } = this.state
+    // 创建新的标题选中状态对象
+    const newTitleSelectedStatus = { ...titleSelectedStatus }
+
+    // 遍历标题选中状态对象
+    // Object.keys() => ['area', 'mode', 'price', 'more']
+    Object.keys(titleSelectedStatus).forEach(key => {
+      // key 表示数组中的每一项，此处，就是每个标题的 type 值。
+      if (key === type) {
+        // 当前标题
+        newTitleSelectedStatus[type] = true
+        return
+      }
+
+      // 其他标题：
+      const selectedVal = selectedValues[key]
+      if (
+        key === 'area' &&
+        (selectedVal.length !== 2 || selectedVal[0] !== 'area')
+      ) {
+        // 高亮
+        newTitleSelectedStatus[key] = true
+      } else if (key === 'mode' && selectedVal[0] !== 'null') {
+        // 高亮
+        newTitleSelectedStatus[key] = true
+      } else if (key === 'price' && selectedVal[0] !== 'null') {
+        // 高亮
+        newTitleSelectedStatus[key] = true
+      } else if (key === 'more') {
+        // 更多选择项 FilterMore 组件
+      } else {
+        newTitleSelectedStatus[key] = false
+      }
+    })
+
+    // console.log('newTitleSelectedStatus：', newTitleSelectedStatus)
+
+    this.setState({
+      // 展示对话框
+      openType: type,
+      // 使用新的标题选中状态对象来更新
+      titleSelectedStatus: newTitleSelectedStatus
+    })
+
+    /* this.setState(prevState => {
       return {
         titleSelectedStatus: {
           // 获取当前对象中所有属性的值
@@ -76,7 +133,7 @@ export default class Filter extends Component {
         // 展示对话框
         openType: type
       }
-    })
+    }) */
   }
 
   // 取消（隐藏对话框）
