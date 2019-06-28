@@ -76,13 +76,14 @@ export default class FilterMore extends Component {
   render() {
     const {
       data: { roomType, oriented, floor, characteristic },
-      onCancel
+      onCancel,
+      type
     } = this.props
 
     return (
       <div className={styles.root}>
         {/* 遮罩层 */}
-        <div className={styles.mask} onClick={onCancel} />
+        <div className={styles.mask} onClick={() => onCancel(type)} />
 
         {/* 条件内容 */}
         <div className={styles.tags}>
