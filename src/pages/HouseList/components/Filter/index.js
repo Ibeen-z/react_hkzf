@@ -206,6 +206,31 @@ export default class Filter extends Component {
     )
   }
 
+  /* 
+    1 封装 renderFilterMore 方法，渲染 FilterMore 组件。
+    2 从 filtersData 中，获取数据（roomType, oriented, floor, characteristic），通过 props 传递给 FilterMore 组件。
+    3 FilterMore 组件中，通过 props 获取到数据，分别将数据传递给 renderFilters 方法。
+    4 在 renderFilters 方法中，通过参数接收数据，遍历数据，渲染标签。
+  */
+  renderFilterMore() {
+    const {
+      openType,
+      filtersData: { roomType, oriented, floor, characteristic }
+    } = this.state
+    if (openType !== 'more') {
+      return null
+    }
+
+    const data = {
+      roomType,
+      oriented,
+      floor,
+      characteristic
+    }
+
+    return <FilterMore data={data} />
+  }
+
   render() {
     const { titleSelectedStatus, openType } = this.state
 
@@ -227,7 +252,7 @@ export default class Filter extends Component {
           {this.renderFilterPicker()}
 
           {/* 最后一个菜单对应的内容： */}
-          {/* <FilterMore /> */}
+          {this.renderFilterMore()}
         </div>
       </div>
     )
