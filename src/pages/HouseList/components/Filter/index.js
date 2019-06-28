@@ -100,17 +100,8 @@ export default class Filter extends Component {
     })
   }
 
-  /* 
-    1 在 Filter 组件的 onTitleClick 方法中，添加 type 为 more 的判断条件。
-    2 当选中值数组长度不为 0 时，表示 FilterMore 组件中有选中项，此时，设置选中状态高亮。
-    3 在点击确定按钮时，根据参数 type 和 value，判断当前菜单是否高亮。
-    4 在关闭对话框时（onCancel），根据 type 和当前type的选中值，判断当前菜单是否高亮。
-      因为 onCancel 方法中，没有 type 参数，所以，就需要在调用 onCancel 方式时，来传递 type 参数。
-  */
-
   // 取消（隐藏对话框）
   onCancel = type => {
-    console.log('cancel:', type)
     const { titleSelectedStatus, selectedValues } = this.state
     // 创建新的标题选中状态对象
     const newTitleSelectedStatus = { ...titleSelectedStatus }
@@ -147,7 +138,6 @@ export default class Filter extends Component {
 
   // 确定（隐藏对话框）
   onSave = (type, value) => {
-    console.log(type, value)
     const { titleSelectedStatus } = this.state
     // 创建新的标题选中状态对象
     const newTitleSelectedStatus = { ...titleSelectedStatus }
@@ -173,6 +163,52 @@ export default class Filter extends Component {
       newTitleSelectedStatus[type] = false
     }
 
+    /* 
+      组装筛选条件：
+
+      1 在 Filter 组件的 onSave 方法中，根据最新 selectedValues 组装筛选条件数据 filters。
+      2 获取区域数据的参数名：area 或 subway（选中值数组的第一个元素）。
+      3 获取区域数据的值（以最后一个 value 为准）。
+      4 获取方式和租金的值（选中值的第一个元素）。
+      5 获取筛选（more）的值（将选中值数组转化为以逗号分隔的字符串）。
+
+      {
+        area: 'AREA|67fad918-f2f8-59df', // 或 subway: '...'
+        mode: 'true', // 或 'null'
+        price: 'PRICE|2000',
+        more: 'ORIEN|80795f1a-e32f-feb9,ROOM|d4a692e4-a177-37fd'
+      }
+    */
+
+    const newSelectedValues = {
+      ...this.state.selectedValues,
+      // 只更新当前 type 对应的选中值
+      [type]: value
+    }
+
+    console.log('最新的选中值：', newSelectedValues)
+    const { area, mode, price, more } = newSelectedValues
+
+    // 筛选条件数据
+    const filters = {}
+
+    // 区域
+    const areaKey = area[0]
+    let areaValue = 'null'
+    if (area.length === 3) {
+      areaValue = area[2] !== 'null' ? area[2] : area[1]
+    }
+    filters[areaKey] = areaValue
+
+    // 方式和租金
+    filters.mode = mode[0]
+    filters.price = price[0]
+
+    // 更多筛选条件 more
+    filters.more = more.join(',')
+
+    console.log(filters)
+
     // 隐藏对话框
     this.setState({
       openType: '',
@@ -180,11 +216,7 @@ export default class Filter extends Component {
       // 更新菜单高亮状态数据
       titleSelectedStatus: newTitleSelectedStatus,
 
-      selectedValues: {
-        ...this.state.selectedValues,
-        // 只更新当前 type 对应的选中值
-        [type]: value
-      }
+      selectedValues: newSelectedValues
     })
   }
 
