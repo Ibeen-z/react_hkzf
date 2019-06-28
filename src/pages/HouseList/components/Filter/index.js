@@ -228,7 +228,7 @@ export default class Filter extends Component {
       characteristic
     }
 
-    return <FilterMore data={data} />
+    return <FilterMore data={data} type={openType} onSave={this.onSave} />
   }
 
   render() {
