@@ -11,21 +11,34 @@ import Filter from './components/Filter'
 import styles from './index.module.css'
 
 // 获取当前定位城市信息
-const { label } = JSON.parse(localStorage.getItem('hkzf_city'))
+const { label, value } = JSON.parse(localStorage.getItem('hkzf_city'))
 
 export default class HouseList extends React.Component {
   /* 
-    1 将筛选条件数据 filters 传递给父组件 HouseList。
-    2 HouseList 组件中，创建方法 onFilter，通过参数接收 filters 数据，并存储到 this 中。
-    3 创建方法 searchHouseList（用来获取房屋列表数据）。
-    4 根据接口，获取当前定位城市 id 参数。
-    5 将筛选条件数据与分页数据合并后，作为接口的参数，发送请求，获取房屋数据。
+    1 在 componentDidMount 钩子函数中，调用 searchHouseList，来获取房屋列表数据。
+    2 给 HouseList 组件添加属性 filters，值为对象。
+    3 添加两个状态：list 和 count（存储房屋列表数据和总条数）。
+    4 将获取到的房屋数据，存储到 state 中。
   */
+
+  state = {
+    // 列表数据
+    list: [],
+    // 总条数
+    count: 0
+  }
+
+  // 初始化实例属性
+  filters = {}
+
+  componentDidMount() {
+    this.searchHouseList()
+  }
 
   // 用来获取房屋列表数据
   async searchHouseList() {
     // 获取当前定位城市id
-    const { value } = JSON.parse(localStorage.getItem('hkzf_city'))
+    // const { value } = JSON.parse(localStorage.getItem('hkzf_city'))
     const res = await API.get('/houses', {
       params: {
         cityId: value,
@@ -34,15 +47,17 @@ export default class HouseList extends React.Component {
         end: 20
       }
     })
-
+    const { list, count } = res.data.body
     console.log(res)
+    this.setState({
+      list,
+      count
+    })
   }
 
   // 接收 Filter 组件中的筛选条件数据
   onFilter = filters => {
     this.filters = filters
-
-    // console.log('HouseList：', this.filters)
 
     // 调用获取房屋数据的方法
     this.searchHouseList()
