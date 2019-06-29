@@ -2,7 +2,7 @@ import React from 'react'
 
 import { Flex } from 'antd-mobile'
 
-import { List } from 'react-virtualized'
+import { List, AutoSizer, WindowScroller } from 'react-virtualized'
 
 import { API } from '../../utils/api'
 import { BASE_URL } from '../../utils/url'
@@ -60,17 +60,11 @@ export default class HouseList extends React.Component {
     this.searchHouseList()
   }
 
-  /* 
-    1 封装 HouseItem 组件，实现 Map 和 HouseList 页面中，房屋列表项的复用。
-    2 使用 HouseItem 组件改造 Map 组件的房屋列表项。
-    3 使用 react-virtualized 的 List 组件渲染房屋列表（参考 CityList 组件的使用）。
-  */
+  // 渲染房屋列表项
   renderHouseList = ({ key, index, style }) => {
     // 根据索引号来获取当前这一行的房屋数据
     const { list } = this.state
     const house = list[index]
-
-    console.log(house)
 
     return (
       <HouseItem
@@ -102,13 +96,24 @@ export default class HouseList extends React.Component {
 
         {/* 房屋列表 */}
         <div className={styles.houseItems}>
-          <List
-            width={300}
-            height={300}
-            rowCount={this.state.count} // List列表项的行数
-            rowHeight={120} // 每一行的高度
-            rowRenderer={this.renderHouseList} // 渲染列表项中的每一行
-          />
+          <WindowScroller>
+            {({ height, isScrolling, scrollTop }) => (
+              <AutoSizer>
+                {({ width }) => (
+                  <List
+                    autoHeight // 设置高度为 WindowScroller 最终渲染的列表高度
+                    width={width} // 视口的宽度
+                    height={height} // 视口的高度
+                    rowCount={this.state.count} // List列表项的行数
+                    rowHeight={120} // 每一行的高度
+                    rowRenderer={this.renderHouseList} // 渲染列表项中的每一行
+                    isScrolling={isScrolling}
+                    scrollTop={scrollTop}
+                  />
+                )}
+              </AutoSizer>
+            )}
+          </WindowScroller>
         </div>
       </div>
     )
