@@ -2,7 +2,12 @@ import React from 'react'
 
 import { Flex } from 'antd-mobile'
 
-import { List, AutoSizer, WindowScroller } from 'react-virtualized'
+import {
+  List,
+  AutoSizer,
+  WindowScroller,
+  InfiniteLoader
+} from 'react-virtualized'
 
 import { API } from '../../utils/api'
 import { BASE_URL } from '../../utils/url'
@@ -66,9 +71,20 @@ export default class HouseList extends React.Component {
     const { list } = this.state
     const house = list[index]
 
+    // 判断 house 是否存在
+    // 如果不存在，就渲染 loading 元素占位
+    if (!house) {
+      return (
+        <div key={key} style={style}>
+          <p className={styles.loading} />
+        </div>
+      )
+    }
+
     return (
       <HouseItem
         key={key}
+        // 注意：该组件中应该接收 style，然后给组件元素设置样式！！！
         style={style}
         src={BASE_URL + house.houseImg}
         title={house.title}
@@ -79,7 +95,52 @@ export default class HouseList extends React.Component {
     )
   }
 
+  // 判断列表中的每一行是否加载完成
+  isRowLoaded = ({ index }) => {
+    return !!this.state.list[index]
+  }
+
+  /* 
+    加载更多房屋列表数据：
+
+    1 在 loadMoreRows 方法中，根据起始索引和结束索引，发送请求，获取更多房屋数据。
+    2 获取到最新的数据后，与当前 list 中的数据合并，再更新 state，并调用 Promise 的 resolve()。
+    3 在 renderHouseList 方法中，判断 house 是否存在。
+    4 不存在的时候，就渲染一个 loading 元素（防止拿不到数据时报错）。
+    5 存在的时候，再渲染 HouseItem 组件。
+  */
+
+  // 用来获取更多房屋列表数据
+  // 注意：该方法的返回值是一个 Promise 对象，并且，这个对象应该在数据加载完成时，来调用 resolve 让Promise对象的状态变为已完成。
+  loadMoreRows = ({ startIndex, stopIndex }) => {
+    // return fetch(`path/to/api?startIndex=${startIndex}&stopIndex=${stopIndex}`)
+    //   .then(response => {
+    //     // Store response data in list...
+    //   })
+    // console.log(startIndex, stopIndex)
+
+    return new Promise(resolve => {
+      API.get('/houses', {
+        params: {
+          cityId: value,
+          ...this.filters,
+          start: startIndex,
+          end: stopIndex
+        }
+      }).then(res => {
+        // console.log('loadMoreRows：', res)
+        this.setState({
+          list: [...this.state.list, ...res.data.body.list]
+        })
+
+        // 数据加载完成时，调用 resolve 即可
+        resolve()
+      })
+    })
+  }
+
   render() {
+    const { count } = this.state
     return (
       <div className={styles.root}>
         {/* 顶部搜索导航 */}
@@ -96,24 +157,34 @@ export default class HouseList extends React.Component {
 
         {/* 房屋列表 */}
         <div className={styles.houseItems}>
-          <WindowScroller>
-            {({ height, isScrolling, scrollTop }) => (
-              <AutoSizer>
-                {({ width }) => (
-                  <List
-                    autoHeight // 设置高度为 WindowScroller 最终渲染的列表高度
-                    width={width} // 视口的宽度
-                    height={height} // 视口的高度
-                    rowCount={this.state.count} // List列表项的行数
-                    rowHeight={120} // 每一行的高度
-                    rowRenderer={this.renderHouseList} // 渲染列表项中的每一行
-                    isScrolling={isScrolling}
-                    scrollTop={scrollTop}
-                  />
+          <InfiniteLoader
+            isRowLoaded={this.isRowLoaded}
+            loadMoreRows={this.loadMoreRows}
+            rowCount={count}
+          >
+            {({ onRowsRendered, registerChild }) => (
+              <WindowScroller>
+                {({ height, isScrolling, scrollTop }) => (
+                  <AutoSizer>
+                    {({ width }) => (
+                      <List
+                        onRowsRendered={onRowsRendered}
+                        ref={registerChild}
+                        autoHeight // 设置高度为 WindowScroller 最终渲染的列表高度
+                        width={width} // 视口的宽度
+                        height={height} // 视口的高度
+                        rowCount={count} // List列表项的行数
+                        rowHeight={120} // 每一行的高度
+                        rowRenderer={this.renderHouseList} // 渲染列表项中的每一行
+                        isScrolling={isScrolling}
+                        scrollTop={scrollTop}
+                      />
+                    )}
+                  </AutoSizer>
                 )}
-              </AutoSizer>
+              </WindowScroller>
             )}
-          </WindowScroller>
+          </InfiniteLoader>
         </div>
       </div>
     )
