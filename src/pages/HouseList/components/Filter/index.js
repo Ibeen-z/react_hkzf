@@ -186,7 +186,6 @@ export default class Filter extends Component {
       [type]: value
     }
 
-    console.log('最新的选中值：', newSelectedValues)
     const { area, mode, price, more } = newSelectedValues
 
     // 筛选条件数据
@@ -207,7 +206,10 @@ export default class Filter extends Component {
     // 更多筛选条件 more
     filters.more = more.join(',')
 
-    console.log(filters)
+    // console.log(filters)
+
+    // 调用父组件中的方法，来将筛选数据传递给父组件
+    this.props.onFilter(filters)
 
     // 隐藏对话框
     this.setState({
