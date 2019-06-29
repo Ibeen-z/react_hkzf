@@ -28,3 +28,8 @@
 .searchHeader :global(.search) {
   height: 30px;
 }
+
+/* 房屋列表样式 */
+.houseItems {
+  padding: 0 15px;
+}

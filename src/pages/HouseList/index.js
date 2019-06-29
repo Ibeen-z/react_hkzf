@@ -14,13 +14,6 @@ import styles from './index.module.css'
 const { label, value } = JSON.parse(localStorage.getItem('hkzf_city'))
 
 export default class HouseList extends React.Component {
-  /* 
-    1 在 componentDidMount 钩子函数中，调用 searchHouseList，来获取房屋列表数据。
-    2 给 HouseList 组件添加属性 filters，值为对象。
-    3 添加两个状态：list 和 count（存储房屋列表数据和总条数）。
-    4 将获取到的房屋数据，存储到 state 中。
-  */
-
   state = {
     // 列表数据
     list: [],
@@ -38,7 +31,7 @@ export default class HouseList extends React.Component {
   // 用来获取房屋列表数据
   async searchHouseList() {
     // 获取当前定位城市id
-    // const { value } = JSON.parse(localStorage.getItem('hkzf_city'))
+
     const res = await API.get('/houses', {
       params: {
         cityId: value,
@@ -48,7 +41,7 @@ export default class HouseList extends React.Component {
       }
     })
     const { list, count } = res.data.body
-    console.log(res)
+
     this.setState({
       list,
       count
@@ -77,6 +70,9 @@ export default class HouseList extends React.Component {
 
         {/* 条件筛选栏 */}
         <Filter onFilter={this.onFilter} />
+
+        {/* 房屋列表 */}
+        <div className={styles.houseItems}>{/* 房屋列表内容 */}</div>
       </div>
     )
   }
