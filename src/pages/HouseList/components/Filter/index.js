@@ -314,38 +314,66 @@ export default class Filter extends Component {
   }
 
   /* 
-    react-spring 的基本使用：
+    实现遮罩层动画：
 
-    1 安装：yarn add react-spring。
-    2 打开 Spring 组件文档（Spring 组件用来将数据从一个状态移动到另一个状态）。
-    3 导入 Spring 组件，使用 Spring 组件包裹要实现动画效果的遮罩层 div。
-    4 通过 render-props 模式，将参数 props（样式） 设置为遮罩层 div 的 style。
-    5 给 Spring 组件添加 from 属性，指定：组件第一次渲染时的动画状态。
-    6 给 Spring 组件添加 to 属性，指定：组件要更新的新动画状态。
+    1 创建方法 renderMask 来渲染遮罩层 div。
+    2 修改渲染遮罩层的逻辑，保证 Spring 组件一直都被渲染（Spring 组件都被销毁了，就无法实现动画效果）。
+    3 修改 to 属性的值，在遮罩层隐藏时为 0，在遮罩层展示时为 1。
+    4 在 render-props 的函数内部，判断 props.opacity 是否等于 0。
+    5 如果等于 0，就返回 null（不渲染遮罩层），解决遮罩层遮挡页面导致顶部导航失效问题。
+    6 如果不等于 0，渲染遮罩层 div。
   */
+  // 渲染遮罩层div
+  renderMask() {
+    const { openType } = this.state
+
+    const isHide = openType === 'more' || openType === ''
+
+    return (
+      <Spring from={{ opacity: 0 }} to={{ opacity: isHide ? 0 : 1 }}>
+        {props => {
+          // 说明遮罩层已经完成动画效果，隐藏了
+          if (props.opacity === 0) {
+            return null
+          }
+
+          return (
+            <div
+              style={props}
+              className={styles.mask}
+              onClick={() => this.onCancel(openType)}
+            />
+          )
+        }}
+      </Spring>
+    )
+
+    /* if (openType === 'more' || openType === '') {
+      return null
+    }
+
+    return (
+      <Spring from={{ opacity: 0 }} to={{ opacity: 1 }}>
+        {props => {
+          return (
+            <div
+              style={props}
+              className={styles.mask}
+              onClick={() => this.onCancel(openType)}
+            />
+          )
+        }}
+      </Spring>
+    ) */
+  }
 
   render() {
-    const { titleSelectedStatus, openType } = this.state
+    const { titleSelectedStatus } = this.state
 
     return (
       <div className={styles.root}>
         {/* 前三个菜单的遮罩层 */}
-        {openType === 'area' || openType === 'mode' || openType === 'price' ? (
-          <Spring from={{ opacity: 0 }} to={{ opacity: 1 }}>
-            {props => {
-              // props => { opacity: 0 } 是从 0 到 1 的中间值
-              console.log(props)
-
-              return (
-                <div
-                  style={props}
-                  className={styles.mask}
-                  onClick={() => this.onCancel(openType)}
-                />
-              )
-            }}
-          </Spring>
-        ) : null}
+        {this.renderMask()}
 
         <div className={styles.content}>
           {/* 标题栏 */}
