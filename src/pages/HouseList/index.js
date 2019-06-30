@@ -16,6 +16,8 @@ import { BASE_URL } from '../../utils/url'
 import SearchHeader from '../../components/SearchHeader'
 import Filter from './components/Filter'
 import HouseItem from '../../components/HouseItem'
+// 导入吸顶组件
+import Sticky from '../../components/Sticky'
 // 导入样式
 import styles from './index.module.css'
 
@@ -153,7 +155,9 @@ export default class HouseList extends React.Component {
         </Flex>
 
         {/* 条件筛选栏 */}
-        <Filter onFilter={this.onFilter} />
+        <Sticky>
+          <Filter onFilter={this.onFilter} />
+        </Sticky>
 
         {/* 房屋列表 */}
         <div className={styles.houseItems}>
