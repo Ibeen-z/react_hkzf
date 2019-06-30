@@ -10,10 +10,11 @@ function FilterFooter({
   okText = '确定',
   onCancel,
   onOk,
-  className
+  className,
+  style
 }) {
   return (
-    <Flex className={[styles.root, className || ''].join(' ')}>
+    <Flex style={style} className={[styles.root, className || ''].join(' ')}>
       {/* 取消按钮 */}
       <span
         className={[styles.btn, styles.cancel].join(' ')}
@@ -36,7 +37,8 @@ FilterFooter.propTypes = {
   okText: PropTypes.string,
   onCancel: PropTypes.func,
   onOk: PropTypes.func,
-  className: PropTypes.string
+  className: PropTypes.string,
+  style: PropTypes.object
 }
 
 export default FilterFooter

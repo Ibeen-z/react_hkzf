@@ -35,7 +35,18 @@ export default class Filter extends Component {
     // 控制 FilterPicker 或 FilterMore 组件的展示或隐藏
     openType: '',
     // 所有筛选条件数据
-    filtersData: {},
+    filtersData: {
+      // FilterMore
+      roomType: [],
+      oriented: [],
+      floor: [],
+      characteristic: [],
+      // FilterPicker
+      area: {},
+      subway: {},
+      rentType: [],
+      price: []
+    },
     // 筛选条件的选中值
     selectedValues
   }
@@ -289,9 +300,8 @@ export default class Filter extends Component {
       selectedValues,
       filtersData: { roomType, oriented, floor, characteristic }
     } = this.state
-    if (openType !== 'more') {
-      return null
-    }
+
+    // 移除 return null
 
     const data = {
       roomType,
@@ -313,20 +323,11 @@ export default class Filter extends Component {
     )
   }
 
-  /* 
-    实现遮罩层动画：
-
-    1 创建方法 renderMask 来渲染遮罩层 div。
-    2 修改渲染遮罩层的逻辑，保证 Spring 组件一直都被渲染（Spring 组件都被销毁了，就无法实现动画效果）。
-    3 修改 to 属性的值，在遮罩层隐藏时为 0，在遮罩层展示时为 1。
-    4 在 render-props 的函数内部，判断 props.opacity 是否等于 0。
-    5 如果等于 0，就返回 null（不渲染遮罩层），解决遮罩层遮挡页面导致顶部导航失效问题。
-    6 如果不等于 0，渲染遮罩层 div。
-  */
   // 渲染遮罩层div
   renderMask() {
     const { openType } = this.state
 
+    // 遮罩层是否隐藏
     const isHide = openType === 'more' || openType === ''
 
     return (
@@ -347,24 +348,6 @@ export default class Filter extends Component {
         }}
       </Spring>
     )
-
-    /* if (openType === 'more' || openType === '') {
-      return null
-    }
-
-    return (
-      <Spring from={{ opacity: 0 }} to={{ opacity: 1 }}>
-        {props => {
-          return (
-            <div
-              style={props}
-              className={styles.mask}
-              onClick={() => this.onCancel(openType)}
-            />
-          )
-        }}
-      </Spring>
-    ) */
   }
 
   render() {
