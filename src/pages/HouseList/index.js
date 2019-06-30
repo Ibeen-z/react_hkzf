@@ -102,25 +102,9 @@ export default class HouseList extends React.Component {
     return !!this.state.list[index]
   }
 
-  /* 
-    加载更多房屋列表数据：
-
-    1 在 loadMoreRows 方法中，根据起始索引和结束索引，发送请求，获取更多房屋数据。
-    2 获取到最新的数据后，与当前 list 中的数据合并，再更新 state，并调用 Promise 的 resolve()。
-    3 在 renderHouseList 方法中，判断 house 是否存在。
-    4 不存在的时候，就渲染一个 loading 元素（防止拿不到数据时报错）。
-    5 存在的时候，再渲染 HouseItem 组件。
-  */
-
   // 用来获取更多房屋列表数据
   // 注意：该方法的返回值是一个 Promise 对象，并且，这个对象应该在数据加载完成时，来调用 resolve 让Promise对象的状态变为已完成。
   loadMoreRows = ({ startIndex, stopIndex }) => {
-    // return fetch(`path/to/api?startIndex=${startIndex}&stopIndex=${stopIndex}`)
-    //   .then(response => {
-    //     // Store response data in list...
-    //   })
-    // console.log(startIndex, stopIndex)
-
     return new Promise(resolve => {
       API.get('/houses', {
         params: {
@@ -155,7 +139,7 @@ export default class HouseList extends React.Component {
         </Flex>
 
         {/* 条件筛选栏 */}
-        <Sticky>
+        <Sticky height={40}>
           <Filter onFilter={this.onFilter} />
         </Sticky>
 

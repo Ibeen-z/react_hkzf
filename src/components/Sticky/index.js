@@ -1,5 +1,7 @@
 import React, { Component, createRef } from 'react'
 
+import PropTypes from 'prop-types'
+
 import styles from './index.module.css'
 
 // dom.getBoundingClientRect() 获取元素的大小及其相对于视口的位置。
@@ -26,6 +28,7 @@ class Sticky extends Component {
 
   // scroll 事件的事件处理程序
   handleScroll = () => {
+    const { height } = this.props
     // 获取DOM对象
     const placeholderEl = this.placeholder.current
     const contentEl = this.content.current
@@ -34,7 +37,7 @@ class Sticky extends Component {
     if (top < 0) {
       // 吸顶
       contentEl.classList.add(styles.fixed)
-      placeholderEl.style.height = '40px'
+      placeholderEl.style.height = `${height}px`
     } else {
       // 取消吸顶
       contentEl.classList.remove(styles.fixed)
@@ -61,6 +64,10 @@ class Sticky extends Component {
       </div>
     )
   }
+}
+
+Sticky.propTypes = {
+  height: PropTypes.number.isRequired
 }
 
 export default Sticky
