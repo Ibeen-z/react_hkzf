@@ -1,5 +1,8 @@
 import React, { Component } from 'react'
 
+// 导入 Spring 组件
+import { Spring } from 'react-spring/renderprops'
+
 import FilterTitle from '../FilterTitle'
 import FilterPicker from '../FilterPicker'
 import FilterMore from '../FilterMore'
@@ -37,13 +40,6 @@ export default class Filter extends Component {
     selectedValues
   }
 
-  /* 
-    展示条件筛选对话框后，页面滚动问题：
-    
-    1 在 componentDidMount 中，获取到 body，并存储在this中（ htmlBody ）。
-    2 在展示对话框的时候，给 body 添加类 body-fixed。
-    3 在关闭对话框（取消或确定）的时候，移除 body 中的类 body-fixed。
-  */
   componentDidMount() {
     // 获取到body
     this.htmlBody = document.body
@@ -317,6 +313,17 @@ export default class Filter extends Component {
     )
   }
 
+  /* 
+    react-spring 的基本使用：
+
+    1 安装：yarn add react-spring。
+    2 打开 Spring 组件文档（Spring 组件用来将数据从一个状态移动到另一个状态）。
+    3 导入 Spring 组件，使用 Spring 组件包裹要实现动画效果的遮罩层 div。
+    4 通过 render-props 模式，将参数 props（样式） 设置为遮罩层 div 的 style。
+    5 给 Spring 组件添加 from 属性，指定：组件第一次渲染时的动画状态。
+    6 给 Spring 组件添加 to 属性，指定：组件要更新的新动画状态。
+  */
+
   render() {
     const { titleSelectedStatus, openType } = this.state
 
@@ -324,10 +331,20 @@ export default class Filter extends Component {
       <div className={styles.root}>
         {/* 前三个菜单的遮罩层 */}
         {openType === 'area' || openType === 'mode' || openType === 'price' ? (
-          <div
-            className={styles.mask}
-            onClick={() => this.onCancel(openType)}
-          />
+          <Spring from={{ opacity: 0 }} to={{ opacity: 1 }}>
+            {props => {
+              // props => { opacity: 0 } 是从 0 到 1 的中间值
+              console.log(props)
+
+              return (
+                <div
+                  style={props}
+                  className={styles.mask}
+                  onClick={() => this.onCancel(openType)}
+                />
+              )
+            }}
+          </Spring>
         ) : null}
 
         <div className={styles.content}>
