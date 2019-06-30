@@ -37,7 +37,17 @@ export default class Filter extends Component {
     selectedValues
   }
 
+  /* 
+    展示条件筛选对话框后，页面滚动问题：
+    
+    1 在 componentDidMount 中，获取到 body，并存储在this中（ htmlBody ）。
+    2 在展示对话框的时候，给 body 添加类 body-fixed。
+    3 在关闭对话框（取消或确定）的时候，移除 body 中的类 body-fixed。
+  */
   componentDidMount() {
+    // 获取到body
+    this.htmlBody = document.body
+
     this.getFiltersData()
   }
 
@@ -56,6 +66,9 @@ export default class Filter extends Component {
   // 注意：this指向的问题！！！
   // 说明：要实现完整的功能，需要后续的组件配合完成！
   onTitleClick = type => {
+    // 给 body 添加样式
+    this.htmlBody.className = 'body-fixed'
+
     const { titleSelectedStatus, selectedValues } = this.state
     // 创建新的标题选中状态对象
     const newTitleSelectedStatus = { ...titleSelectedStatus }
@@ -102,6 +115,8 @@ export default class Filter extends Component {
 
   // 取消（隐藏对话框）
   onCancel = type => {
+    this.htmlBody.className = ''
+
     const { titleSelectedStatus, selectedValues } = this.state
     // 创建新的标题选中状态对象
     const newTitleSelectedStatus = { ...titleSelectedStatus }
@@ -138,6 +153,8 @@ export default class Filter extends Component {
 
   // 确定（隐藏对话框）
   onSave = (type, value) => {
+    this.htmlBody.className = ''
+
     const { titleSelectedStatus } = this.state
     // 创建新的标题选中状态对象
     const newTitleSelectedStatus = { ...titleSelectedStatus }

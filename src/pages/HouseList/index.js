@@ -42,16 +42,6 @@ export default class HouseList extends React.Component {
     this.searchHouseList()
   }
 
-  /* 
-    开启加载中提示和加载完成提示：
-
-    1 导入 Toast 组件。
-    2 在发送请求前使用 Toast.loading() 方法，开启 loading 效果。
-    3 请求完成时，调用 Toast.hide() 关闭 loading 效果。
-    4 请求完成时，调用 Toast.info() 提示查找到的房源数量。
-      说明：如果 count 为 0，就不再弹框提示，而是使用 找不到房源时的提示。
-  */
-
   // 用来获取房屋列表数据
   async searchHouseList() {
     // 获取当前定位城市id
@@ -89,6 +79,8 @@ export default class HouseList extends React.Component {
 
   // 接收 Filter 组件中的筛选条件数据
   onFilter = filters => {
+    // 返回页面顶部
+    window.scrollTo(0, 0)
     this.filters = filters
 
     // 调用获取房屋数据的方法
@@ -152,19 +144,6 @@ export default class HouseList extends React.Component {
       })
     })
   }
-
-  /* 
-    找不到房源时的提示 实现步骤：
-
-    1 在 state 中添加一个状态：isLoading 表示数据是否加载中。
-    2 在发送请求之前，设置 isLoading 的值为 true，表示即将要加载数据了。
-    3 在请求完成后，设置 isLoading 的值为 false，表示数据已经加载完成。
-    4 导入 NoHouse 组件。
-    5 封装 renderList 方法，来渲染房源列表。
-    6 在方法中，判断查询到的房源数量为0，并且已经 count === 0 && !isLoading 时，
-      提示： 没有找到相关的内容，请您换个搜索条件吧~
-    7 否则，展示房源列表
-  */
 
   // 渲染列表数据
   renderList() {
