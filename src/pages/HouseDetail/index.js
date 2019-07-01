@@ -96,6 +96,10 @@ export default class HouseDetail extends Component {
   }
 
   componentDidMount() {
+    // 获取配置好的路由参数：
+    console.log('路由参数对象：', this.props.match.params)
+    // console.log(this.props)
+
     this.renderMap('天山星城', {
       latitude: '31.219228',
       longitude: '121.391768'

@@ -6,6 +6,7 @@ import { BrowserRouter as Router, Route, Redirect } from 'react-router-dom'
 import Home from './pages/Home'
 import CityList from './pages/CityList'
 import Map from './pages/Map'
+// 房源详情组件
 import HouseDetail from './pages/HouseDetail'
 
 function App() {
@@ -19,7 +20,9 @@ function App() {
         <Route path="/home" component={Home} />
         <Route path="/citylist" component={CityList} />
         <Route path="/map" component={Map} />
-        <Route path="/detail" component={HouseDetail} />
+
+        {/* 房源详情的路由规则： */}
+        <Route path="/detail/:id" component={HouseDetail} />
       </div>
     </Router>
   )
