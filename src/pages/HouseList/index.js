@@ -11,6 +11,7 @@ import {
 
 import { API } from '../../utils/api'
 import { BASE_URL } from '../../utils/url'
+import { getCurrentCity } from '../../utils'
 
 // 导入搜索导航栏组件
 import SearchHeader from '../../components/SearchHeader'
@@ -23,7 +24,7 @@ import NoHouse from '../../components/NoHouse'
 import styles from './index.module.css'
 
 // 获取当前定位城市信息
-const { label, value } = JSON.parse(localStorage.getItem('hkzf_city'))
+// const { label, value } = JSON.parse(localStorage.getItem('hkzf_city'))
 
 export default class HouseList extends React.Component {
   state = {
@@ -35,10 +36,19 @@ export default class HouseList extends React.Component {
     isLoading: false
   }
 
+  // 初始化默认值
+  label = ''
+  value = ''
+
   // 初始化实例属性
   filters = {}
 
-  componentDidMount() {
+  async componentDidMount() {
+    // console.log('HouseList -> did mount')
+    const { label, value } = await getCurrentCity()
+    this.label = label
+    this.value = value
+
     this.searchHouseList()
   }
 
@@ -53,7 +63,7 @@ export default class HouseList extends React.Component {
     Toast.loading('加载中...', 0, null, false)
     const res = await API.get('/houses', {
       params: {
-        cityId: value,
+        cityId: this.value,
         ...this.filters,
         start: 1,
         end: 20
@@ -106,6 +116,7 @@ export default class HouseList extends React.Component {
     return (
       <HouseItem
         key={key}
+        onClick={() => this.props.history.push(`/detail/${house.houseCode}`)}
         // 注意：该组件中应该接收 style，然后给组件元素设置样式！！！
         style={style}
         src={BASE_URL + house.houseImg}
@@ -128,7 +139,7 @@ export default class HouseList extends React.Component {
     return new Promise(resolve => {
       API.get('/houses', {
         params: {
-          cityId: value,
+          cityId: this.value,
           ...this.filters,
           start: startIndex,
           end: stopIndex
@@ -195,7 +206,7 @@ export default class HouseList extends React.Component {
             className="iconfont icon-back"
             onClick={() => this.props.history.go(-1)}
           />
-          <SearchHeader cityName={label} className={styles.searchHeader} />
+          <SearchHeader cityName={this.label} className={styles.searchHeader} />
         </Flex>
 
         {/* 条件筛选栏 */}

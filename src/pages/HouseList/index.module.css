@@ -34,6 +34,10 @@
   padding: 0 15px;
 }
 
+.houseItems :global(.ReactVirtualized__List) {
+  padding-bottom: 50px;
+}
+
 .loading {
   line-height: 120px;
   text-align: center;
