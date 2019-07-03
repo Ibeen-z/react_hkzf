@@ -36,3 +36,6 @@ export const getCurrentCity = () => {
   // 因为此处的 Promise 不会失败，所以，此处，只要返回一个成功的Promise即可
   return Promise.resolve(localCity)
 }
+
+export { API } from './api'
+export { BASE_URL } from './url'
