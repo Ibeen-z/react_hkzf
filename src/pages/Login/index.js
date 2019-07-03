@@ -4,7 +4,7 @@ import { Flex, WingBlank, WhiteSpace, Toast } from 'antd-mobile'
 import { Link } from 'react-router-dom'
 
 // 导入withFormik
-import { withFormik } from 'formik'
+import { withFormik, Form, Field, ErrorMessage } from 'formik'
 
 // 导入Yup
 import * as Yup from 'yup'
@@ -21,28 +21,16 @@ const REG_UNAME = /^[a-zA-Z_\d]{5,8}$/
 const REG_PWD = /^[a-zA-Z_\d]{5,12}$/
 
 /* 
-  给登录功能添加表单验证：
+  简化表单处理：
 
-  1 安装：yarn add yup （ Yup 文档 ），导入 Yup。
-  2 在 withFormik 中添加配置项 validationSchema，使用 Yup 添加表单校验规则（文档）。
-  3 在 Login 组件中，通过 props 获取到 errors（错误信息）和  touched（是否访问过，注意：需要给表单元素添加 handleBlur 处理失焦点事件才生效！）。
-  4 在表单元素中通过这两个对象展示表单校验错误信息。
+  1 导入 Form 组件，替换 form 元素，去掉 onSubmit。
+  2 导入 Field 组件，替换 input 表单元素，去掉 onChange、onBlur、value。
+  3 导入 ErrorMessage 组件，原来的错误消息逻辑代码。
+  4 去掉所有 props。
 */
 
 class Login extends Component {
   render() {
-    // 通过 props 获取高阶组件传递进来的属性
-    const {
-      values,
-      handleSubmit,
-      handleChange,
-      handleBlur,
-      errors,
-      touched
-    } = this.props
-
-    // console.log(errors, touched)
-
     return (
       <div className={styles.root}>
         {/* 顶部导航 */}
@@ -51,44 +39,40 @@ class Login extends Component {
 
         {/* 登录表单 */}
         <WingBlank>
-          <form onSubmit={handleSubmit}>
+          <Form>
+            {/* 账号 */}
             <div className={styles.formItem}>
-              <input
+              <Field
                 className={styles.input}
-                value={values.username}
-                onChange={handleChange}
-                onBlur={handleBlur}
                 name="username"
                 placeholder="请输入账号"
               />
             </div>
-            {errors.username && touched.username && (
-              <div className={styles.error}>{errors.username}</div>
-            )}
-            {/* 长度为5到8位，只能出现数字、字母、下划线 */}
-            {/* <div className={styles.error}>账号为必填项</div> */}
+            <ErrorMessage
+              className={styles.error}
+              name="username"
+              component="div"
+            />
+            {/* 密码 */}
             <div className={styles.formItem}>
-              <input
+              <Field
                 className={styles.input}
-                value={values.password}
-                onChange={handleChange}
-                onBlur={handleBlur}
                 name="password"
                 type="password"
                 placeholder="请输入密码"
               />
             </div>
-            {errors.password && touched.password && (
-              <div className={styles.error}>{errors.password}</div>
-            )}
-            {/* 长度为5到12位，只能出现数字、字母、下划线 */}
-            {/* <div className={styles.error}>密码为必填项</div> */}
+            <ErrorMessage
+              className={styles.error}
+              name="password"
+              component="div"
+            />
             <div className={styles.formSubmit}>
               <button className={styles.submit} type="submit">
                 登 录
               </button>
             </div>
-          </form>
+          </Form>
           <Flex className={styles.backHome}>
             <Flex.Item>
               <Link to="/registe">还没有账号，去注册~</Link>
@@ -127,7 +111,6 @@ Login = withFormik({
       password
     })
 
-    console.log('登录结果：', res)
     const { status, body, description } = res.data
 
     if (status === 200) {
