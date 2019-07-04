@@ -39,3 +39,5 @@ export const getCurrentCity = () => {
 
 export { API } from './api'
 export { BASE_URL } from './url'
+// 导出 auth 模块中的所有内容
+export * from './auth'

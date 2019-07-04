@@ -3,7 +3,7 @@ import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import { Grid, Button } from 'antd-mobile'
 
-import { BASE_URL } from '../../utils'
+import { BASE_URL, isAuth, getToken, API } from '../../utils'
 
 import styles from './index.module.css'
 
@@ -21,21 +21,67 @@ const menus = [
   { id: 6, name: '联系我们', iconfont: 'icon-cust' }
 ]
 
-export default class Profile extends Component {
-  avatarEditor = React.createRef()
+// 默认头像
+const DEFAULT_AVATAR = BASE_URL + '/img/profile/avatar.png'
 
+/* 
+  1 在 state 中添加两个状态：isLogin（是否登录） 和 userInfo（用户信息）。
+  2 从 utils 中导入 isAuth（登录状态）、getToken（获取token）。
+  3 创建方法 getUserInfo，用来获取个人资料。
+  4 在方法中，通过 isLogin 判断用户是否登录。
+  5 如果没有登录，则不发送请求，渲染未登录信息。
+  6 如果已登录，就根据接口发送请求，获取用户个人资料。
+  7 渲染个人资料数据。
+*/
+
+export default class Profile extends Component {
   state = {
+    // 是否登录
+    isLogin: isAuth(),
+    // 用户信息
     userInfo: {
-      nickname: '' || '游客',
-      avatar: '' || BASE_URL + '/img/profile/avatar.png'
+      avatar: '',
+      nickname: ''
+    }
+  }
+
+  // 注意：不要忘了在进入页面时调用方法 ！
+  componentDidMount() {
+    this.getUserInfo()
+  }
+
+  async getUserInfo() {
+    if (!this.state.isLogin) {
+      // 未登录
+      return
+    }
+
+    // 发送请求，获取个人资料
+    const res = await API.get('/user', {
+      headers: {
+        authorization: getToken()
+      }
+    })
+
+    // console.log(res)
+    if (res.data.status === 200) {
+      const { avatar, nickname } = res.data.body
+      this.setState({
+        userInfo: {
+          avatar: BASE_URL + avatar,
+          nickname
+        }
+      })
     }
   }
 
   render() {
-    const {
-      userInfo: { nickname, avatar }
-    } = this.state
     const { history } = this.props
+
+    const {
+      isLogin,
+      userInfo: { avatar, nickname }
+    } = this.state
 
     return (
       <div className={styles.root}>
@@ -48,34 +94,41 @@ export default class Profile extends Component {
           />
           <div className={styles.info}>
             <div className={styles.myIcon}>
-              <img className={styles.avatar} src={avatar} alt="icon" />
+              <img
+                className={styles.avatar}
+                src={avatar || DEFAULT_AVATAR}
+                alt="icon"
+              />
             </div>
             <div className={styles.user}>
               <div className={styles.name}>{nickname || '游客'}</div>
               {/* 登录后展示： */}
-              {/* <>
-                <div className={styles.auth}>
-                  <span onClick={this.logout}>退出</span>
-                </div>
+              {isLogin ? (
+                <>
+                  <div className={styles.auth}>
+                    <span onClick={this.logout}>退出</span>
+                  </div>
+                  <div className={styles.edit}>
+                    编辑个人资料
+                    <span className={styles.arrow}>
+                      <i className="iconfont icon-arrow" />
+                    </span>
+                  </div>
+                </>
+              ) : (
                 <div className={styles.edit}>
-                  编辑个人资料
-                  <span className={styles.arrow}>
-                    <i className="iconfont icon-arrow" />
-                  </span>
+                  <Button
+                    type="primary"
+                    size="small"
+                    inline
+                    onClick={() => history.push('/login')}
+                  >
+                    去登录
+                  </Button>
                 </div>
-              </> */}
+              )}
 
               {/* 未登录展示： */}
-              <div className={styles.edit}>
-                <Button
-                  type="primary"
-                  size="small"
-                  inline
-                  onClick={() => history.push('/login')}
-                >
-                  去登录
-                </Button>
-              </div>
             </div>
           </div>
         </div>
