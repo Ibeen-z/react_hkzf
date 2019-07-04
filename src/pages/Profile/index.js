@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 
 import { Link } from 'react-router-dom'
-import { Grid, Button } from 'antd-mobile'
+import { Grid, Button, Modal } from 'antd-mobile'
 
-import { BASE_URL, isAuth, getToken, API } from '../../utils'
+import { BASE_URL, isAuth, removeToken, API } from '../../utils'
 
 import styles from './index.module.css'
 
@@ -24,14 +24,15 @@ const menus = [
 // 默认头像
 const DEFAULT_AVATAR = BASE_URL + '/img/profile/avatar.png'
 
+const alert = Modal.alert
 /* 
-  1 在 state 中添加两个状态：isLogin（是否登录） 和 userInfo（用户信息）。
-  2 从 utils 中导入 isAuth（登录状态）、getToken（获取token）。
-  3 创建方法 getUserInfo，用来获取个人资料。
-  4 在方法中，通过 isLogin 判断用户是否登录。
-  5 如果没有登录，则不发送请求，渲染未登录信息。
-  6 如果已登录，就根据接口发送请求，获取用户个人资料。
-  7 渲染个人资料数据。
+  1 给退出按钮绑定单击事件，创建方法 logout 作为事件处理程序。
+  2 导入 Modal 对话框组件（文档）。
+  3 在方法中，拷贝 Modal 组件文档中确认对话框的示例代码。
+  4 修改对话框的文字提示。
+  5 在退出按钮的事件处理程序中，先调用退出接口（让服务端退出），再移除本地token（本地退出）。
+  6 将登陆状态 isLogin 设置为 false。
+  7 清空用户状态对象。
 */
 
 export default class Profile extends Component {
@@ -50,6 +51,32 @@ export default class Profile extends Component {
     this.getUserInfo()
   }
 
+  // 退出
+  logout = () => {
+    alert('提示', '是否确定退出?', [
+      { text: '取消' },
+      {
+        text: '退出',
+        onPress: async () => {
+          // 调用退出接口
+          await API.post('/user/logout')
+
+          // 移除本地token
+          removeToken()
+
+          // 处理状态
+          this.setState({
+            isLogin: false,
+            userInfo: {
+              avatar: '',
+              nickname: ''
+            }
+          })
+        }
+      }
+    ])
+  }
+
   async getUserInfo() {
     if (!this.state.isLogin) {
       // 未登录
@@ -57,11 +84,7 @@ export default class Profile extends Component {
     }
 
     // 发送请求，获取个人资料
-    const res = await API.get('/user', {
-      headers: {
-        authorization: getToken()
-      }
-    })
+    const res = await API.get('/user')
 
     // console.log(res)
     if (res.data.status === 200) {
@@ -71,6 +94,11 @@ export default class Profile extends Component {
           avatar: BASE_URL + avatar,
           nickname
         }
+      })
+    } else {
+      // token 失效的情况，这种情况下， 应该将 isLogin 设置为 false
+      this.setState({
+        isLogin: false
       })
     }
   }
