@@ -12,6 +12,9 @@ import HouseDetail from './pages/HouseDetail'
 import Login from './pages/Login'
 import Registe from './pages/Registe'
 
+//
+// import AuthRoute from './components/AuthRoute'
+
 function App() {
   return (
     <Router>
