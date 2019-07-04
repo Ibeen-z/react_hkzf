@@ -126,7 +126,7 @@ export default class HouseDetail extends Component {
 
     const res = await API.get(`/houses/${id}`)
 
-    console.log(res.data.body)
+    // console.log(res.data.body)
 
     this.setState({
       houseInfo: res.data.body,
