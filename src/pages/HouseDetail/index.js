@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 
-import { Carousel, Flex } from 'antd-mobile'
+import { Carousel, Flex, Modal, Toast } from 'antd-mobile'
 
 import NavHeader from '../../components/NavHeader'
 import HouseItem from '../../components/HouseItem'
@@ -58,6 +58,8 @@ const labelStyle = {
   userSelect: 'none'
 }
 
+const alert = Modal.alert
+
 export default class HouseDetail extends Component {
   state = {
     // 数据加载中状态
@@ -112,18 +114,7 @@ export default class HouseDetail extends Component {
     this.checkFavorite()
   }
 
-  /* 
-    检查房源是否收藏：
-
-    1 在 state 中添加状态：isFavorite （表示是否收藏） ，默认值为 false。
-    2 创建方法 checkFavorite，在进入房源详情页面时调用该方法。
-    3 先调用 isAuth 方法，来判断是否已登录。
-    4 如果未登录，直接 return，不再检查是否收藏。
-    5 如果已登录，从路由参数中，获取到当前房屋id。
-    6 使用 API 调用接口，查询该房源是否收藏。
-    7 如果返回状态码为 200 ，就更新 isFavorite；否则，不做任何处理（token过期）。
-    8 在页面结构中，通过状态 isFavorite 修改收藏按钮的文字和图片内容。
-  */
+  // 检查房源是否收藏：
   async checkFavorite() {
     const isLogin = isAuth()
 
@@ -142,6 +133,82 @@ export default class HouseDetail extends Component {
       this.setState({
         isFavorite: body.isFavorite
       })
+    }
+  }
+
+  /* 
+    收藏房源：
+
+    1 给收藏按钮绑定单击事件，创建方法 handleFavorite 作为事件处理程序。
+    2 调用 isAuth 方法，判断是否登录。
+    3 如果未登录，则使用 Modal.alert 提示用户是否去登录。
+    4 如果点击取消，则不做任何操作。
+    5 如果点击去登录，就跳转到登录页面，同时传递 state（登录后，再回到房源收藏页面）。
+    
+    6 根据 isFavorite 判断，当前房源是否收藏。
+    7 如果未收藏，就调用添加收藏接口，添加收藏。
+    8 如果已收藏，就调用删除收藏接口，去除收藏。
+
+    alert('提示', '登录后才能收藏房源，是否去登录?', [
+      { text: '取消' },
+      {
+        text: '去登录',
+        onPress: () => {}
+      }
+    ])
+  */
+
+  handleFavorite = async () => {
+    const isLogin = isAuth()
+    const { history, location, match } = this.props
+
+    if (!isLogin) {
+      // 未登录
+      return alert('提示', '登录后才能收藏房源，是否去登录?', [
+        { text: '取消' },
+        {
+          text: '去登录',
+          // 使用 replace 方法，解决登录后返回详情页面，再点击左上角返回按钮时
+          // 需要点击两次的问题
+          // onPress: () => history.push('/login', { from: location })
+          onPress: () => history.replace('/login', { from: location })
+        }
+      ])
+    }
+
+    // 已登录
+    const { isFavorite } = this.state
+    const { id } = match.params
+
+    if (isFavorite) {
+      // 已收藏，应该删除收藏
+      const res = await API.delete(`/user/favorites/${id}`)
+      // console.log(res)
+      this.setState({
+        isFavorite: false
+      })
+
+      if (res.data.status === 200) {
+        // 提示用户取消收藏
+        Toast.info('已取消收藏', 1, null, false)
+      } else {
+        // token 超时
+        Toast.info('登录超时，请重新登录', 2, null, false)
+      }
+    } else {
+      // 未收藏，应该添加收藏
+      const res = await API.post(`/user/favorites/${id}`)
+      // console.log(res)
+      if (res.data.status === 200) {
+        // 提示用户收藏成功
+        Toast.info('已收藏', 1, null, false)
+        this.setState({
+          isFavorite: true
+        })
+      } else {
+        // token 超时
+        Toast.info('登录超时，请重新登录', 2, null, false)
+      }
     }
   }
 
@@ -371,7 +438,7 @@ export default class HouseDetail extends Component {
 
         {/* 底部收藏按钮 */}
         <Flex className={styles.fixedBottom}>
-          <Flex.Item>
+          <Flex.Item onClick={this.handleFavorite}>
             <img
               src={
                 BASE_URL + (isFavorite ? '/img/star.png' : '/img/unstar.png')
