@@ -6,8 +6,9 @@ import NavHeader from '../../components/NavHeader'
 import HouseItem from '../../components/HouseItem'
 import HousePackage from '../../components/HousePackage'
 
-import { BASE_URL } from '../../utils/url'
-import { API } from '../../utils/api'
+// import { BASE_URL } from '../../utils/url'
+// import { API } from '../../utils/api'
+import { isAuth, BASE_URL, API } from '../../utils'
 
 import styles from './index.module.css'
 
@@ -93,7 +94,10 @@ export default class HouseDetail extends Component {
       houseCode: '',
       // 房屋描述
       description: ''
-    }
+    },
+
+    // 表示房源是否收藏
+    isFavorite: false
   }
 
   componentDidMount() {
@@ -103,19 +107,45 @@ export default class HouseDetail extends Component {
 
     // 获取房屋数据
     this.getHouseDetail()
+
+    // 检查房源是否收藏
+    this.checkFavorite()
   }
 
   /* 
-    展示房屋详情：
-    
-    1 在找房页面中，给每一个房源列表项添加单击事件，在点击时跳转到房屋详情页面。
-    2 在单击事件中，获取到当前房屋 id。
-    3 根据房屋详情的路由地址，调用 history.push() 实现路由跳转。
-    4 封装 getHouseDetail 方法，在 componentDidMount 中调用该方法。
-    5 在方法中，通过路由参数获取到当前房屋 id。
-    6 使用 API 发送请求，获取房屋数据，保存到 state 中。
-    7 使用房屋数据，渲染房屋详情。
+    检查房源是否收藏：
+
+    1 在 state 中添加状态：isFavorite （表示是否收藏） ，默认值为 false。
+    2 创建方法 checkFavorite，在进入房源详情页面时调用该方法。
+    3 先调用 isAuth 方法，来判断是否已登录。
+    4 如果未登录，直接 return，不再检查是否收藏。
+    5 如果已登录，从路由参数中，获取到当前房屋id。
+    6 使用 API 调用接口，查询该房源是否收藏。
+    7 如果返回状态码为 200 ，就更新 isFavorite；否则，不做任何处理（token过期）。
+    8 在页面结构中，通过状态 isFavorite 修改收藏按钮的文字和图片内容。
   */
+  async checkFavorite() {
+    const isLogin = isAuth()
+
+    if (!isLogin) {
+      // 没有登录
+      return
+    }
+
+    // 已登录
+    const { id } = this.props.match.params
+    const res = await API.get(`/user/favorites/${id}`)
+
+    const { status, body } = res.data
+    if (status === 200) {
+      // 表示请求已经成功，需要更新 isFavorite 的值
+      this.setState({
+        isFavorite: body.isFavorite
+      })
+    }
+  }
+
+  // 获取房屋详细信息
   async getHouseDetail() {
     const { id } = this.props.match.params
 
@@ -209,7 +239,8 @@ export default class HouseDetail extends Component {
         oriented,
         supporting,
         description
-      }
+      },
+      isFavorite
     } = this.state
     return (
       <div className={styles.root}>
@@ -342,11 +373,15 @@ export default class HouseDetail extends Component {
         <Flex className={styles.fixedBottom}>
           <Flex.Item>
             <img
-              src={BASE_URL + '/img/unstar.png'}
+              src={
+                BASE_URL + (isFavorite ? '/img/star.png' : '/img/unstar.png')
+              }
               className={styles.favoriteImg}
               alt="收藏"
             />
-            <span className={styles.favorite}>收藏</span>
+            <span className={styles.favorite}>
+              {isFavorite ? '已收藏' : '收藏'}
+            </span>
           </Flex.Item>
           <Flex.Item>在线咨询</Flex.Item>
           <Flex.Item>
