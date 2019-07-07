@@ -63,7 +63,7 @@ const HOUSE_PACKAGE = [
   2 从所有配置列表中选择房屋配置（发布房源页面）
     <HousePackage select onSelect={selectedItems => {...}} />
 */
-export default class HousePackage extends Component {
+class HousePackage extends Component {
   state = {
     // 选中名称
     selectedNames: []
@@ -132,3 +132,10 @@ export default class HousePackage extends Component {
     return <ul className={styles.root}>{this.renderItems()}</ul>
   }
 }
+
+// 属性默认值，防止在使用该组件时，不传 onSelect 报错
+HousePackage.defaultProps = {
+  onSelect: () => {}
+}
+
+export default HousePackage
