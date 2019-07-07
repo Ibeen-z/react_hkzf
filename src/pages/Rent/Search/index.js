@@ -11,6 +11,7 @@ export default class Search extends Component {
   cityId = getCity().value
 
   state = {
+    // 搜索框的值
     searchTxt: '',
     tipsList: []
   }
@@ -20,8 +21,8 @@ export default class Search extends Component {
     const { tipsList } = this.state
 
     return tipsList.map(item => (
-      <li key={item.value} className={styles.tip}>
-        {item.label}
+      <li key={item.community} className={styles.tip}>
+        {item.communityName}
       </li>
     ))
   }
