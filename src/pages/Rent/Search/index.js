@@ -18,12 +18,34 @@ export default class Search extends Component {
     tipsList: []
   }
 
+  /* 
+    传递小区数据：
+
+    1 给搜索列表项添加单击事件。
+    2 在事件处理程序中，调用 history.replace() 方法跳转到发布房源页面。
+    3 将被点击的小区信息作为数据一起传递过去。
+
+    4 在发布房源页面，判断 history.loaction.state 是否为空。
+    5 如果为空，不做任何处理。
+    6 如果不为空，则将小区信息存储到发布房源页面的状态中。
+  */
+  onTipsClick = item => {
+    this.props.history.replace('/rent/add', {
+      name: item.communityName,
+      id: item.community
+    })
+  }
+
   // 渲染搜索结果列表
   renderTips = () => {
     const { tipsList } = this.state
 
     return tipsList.map(item => (
-      <li key={item.community} className={styles.tip}>
+      <li
+        key={item.community}
+        className={styles.tip}
+        onClick={() => this.onTipsClick(item)}
+      >
         {item.communityName}
       </li>
     ))
@@ -31,12 +53,6 @@ export default class Search extends Component {
 
   /* 
     关键词搜索小区信息
-
-    1 给 SearchBar 组件，添加 onChange 配置项，获取文本框的值。
-    2 判断当前文本框的值是否为空。
-    3 如果为空，清空列表，然后 return，不再发送请求。
-    4 如果不为空，使用 API 发送请求，获取小区数据。
-    5 使用定时器 setTimeout 来延迟搜索，提升性能。
   */
   handleSearchTxt = value => {
     this.setState({ searchTxt: value })
@@ -80,7 +96,7 @@ export default class Search extends Component {
           value={searchTxt}
           onChange={this.handleSearchTxt}
           showCancelButton={true}
-          onCancel={() => history.go(-1)}
+          onCancel={() => history.replace('/rent/add')}
         />
 
         {/* 搜索提示列表 */}

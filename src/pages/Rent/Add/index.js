@@ -49,15 +49,25 @@ export default class RentAdd extends Component {
   constructor(props) {
     super(props)
 
+    // console.log(props)
+    const { state } = props.location
+    const community = {
+      name: '',
+      id: ''
+    }
+
+    if (state) {
+      // 有小区信息数据，存储到状态中
+      community.name = state.name
+      community.id = state.id
+    }
+
     this.state = {
       // 临时图片地址
       tempSlides: [],
 
       // 小区的名称和id
-      community: {
-        name: '',
-        id: ''
-      },
+      community,
       // 价格
       price: '',
       // 面积
@@ -119,7 +129,7 @@ export default class RentAdd extends Component {
           <Item
             extra={community.name || '请输入小区名称'}
             arrow="horizontal"
-            onClick={() => history.push('/rent/search')}
+            onClick={() => history.replace('/rent/search')}
           >
             小区名称
           </Item>
