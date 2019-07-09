@@ -104,15 +104,25 @@ export default class RentAdd extends Component {
 
   /* 
     获取表单数据：
-
-    1 创建方法 getValue 作为三个组件的事件处理程序。
-    2 该方法接收两个参数：1 name 当前状态名 2 value 当前输入值或选中值。
-    3 分别给 InputItem / TextareaItem / Picker 组件，添加 onChange 配置项。
-    4 分别调用 getValue 并传递 name 和 value 两个参数（注意：Picker 组件选中值为数组，而接口需要字符串，所以，取索引号为 0 的值即可）。
   */
   getValue = (name, value) => {
     this.setState({
       [name]: value
+    })
+  }
+
+  /* 
+    获取房屋配置数据：
+
+    1 给 HousePackge 组件，添加 onSelect 属性。
+    2 在 onSelect 处理方法中，通过参数获取到当前选中项的值。
+    3 根据发布房源接口的参数说明，将获取到的数组类型的选中值，转化为字符串类型。
+    4 调用 setState() 更新状态。
+  */
+  handleSupporting = selected => {
+    // console.log(selected)
+    this.setState({
+      supporting: selected.join('|')
     })
   }
 
@@ -229,7 +239,7 @@ export default class RentAdd extends Component {
           renderHeader={() => '房屋配置'}
           data-role="rent-list"
         >
-          <HousePackge select />
+          <HousePackge select onSelect={this.handleSupporting} />
         </List>
 
         {/* 房屋描述 */}
