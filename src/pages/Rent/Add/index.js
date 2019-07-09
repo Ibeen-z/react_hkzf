@@ -10,6 +10,8 @@ import {
   Modal
 } from 'antd-mobile'
 
+import { API } from '../../../utils'
+
 import NavHeader from '../../../components/NavHeader'
 import HousePackge from '../../../components/HousePackage'
 
@@ -113,17 +115,58 @@ export default class RentAdd extends Component {
 
   /* 
     获取房屋配置数据：
-
-    1 给 HousePackge 组件，添加 onSelect 属性。
-    2 在 onSelect 处理方法中，通过参数获取到当前选中项的值。
-    3 根据发布房源接口的参数说明，将获取到的数组类型的选中值，转化为字符串类型。
-    4 调用 setState() 更新状态。
   */
   handleSupporting = selected => {
     // console.log(selected)
     this.setState({
       supporting: selected.join('|')
     })
+  }
+
+  /* 
+    获取房屋图片：
+
+    1 给 ImagePicker 组件添加 onChange 配置项。
+    2 通过 onChange 的参数，获取到上传的图片，并存储到状态 tempSlides 中。
+  */
+  handleHouseImg = (files, type, index) => {
+    console.log(files, type, index)
+    this.setState({
+      tempSlides: files
+    })
+  }
+
+  /* 
+    上传房屋图片：
+
+    1 给提交按钮，绑定单击事件。
+    2 在事件处理程序中，判断是否有房屋图片。
+    3 如果没有，不做任何处理。
+    4 如果有，就创建 FormData 的实例对象（form）。
+    5 遍历 tempSlides 数组，分别将每一个图片对象，添加到 form 中（键为： file，根据接口文档获得）。
+    6 调用图片上传接口，传递form参数，并设置请求头 Content-Type 为 multipart/form-data。
+    7 通过接口返回值获取到的图片路径。
+  */
+  addHouse = async () => {
+    const { tempSlides } = this.state
+    let houseImg = ''
+
+    if (tempSlides.length > 0) {
+      // 已经有上传的图片了
+      const form = new FormData()
+      tempSlides.forEach(item => form.append('file', item.file))
+
+      const res = await API.post('/houses/image', form, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+
+      // console.log(res)
+      houseImg = res.data.body.join('|')
+    }
+
+    console.log(houseImg)
   }
 
   render() {
@@ -228,6 +271,7 @@ export default class RentAdd extends Component {
         >
           <ImagePicker
             files={tempSlides}
+            onChange={this.handleHouseImg}
             multiple={true}
             className={styles.imgpicker}
           />
