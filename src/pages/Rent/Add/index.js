@@ -7,7 +7,8 @@ import {
   Picker,
   ImagePicker,
   TextareaItem,
-  Modal
+  Modal,
+  Toast
 } from 'antd-mobile'
 
 import { API } from '../../../utils'
@@ -137,20 +138,30 @@ export default class RentAdd extends Component {
   }
 
   /* 
-    上传房屋图片：
+    发布房源：
 
-    1 给提交按钮，绑定单击事件。
-    2 在事件处理程序中，判断是否有房屋图片。
-    3 如果没有，不做任何处理。
-    4 如果有，就创建 FormData 的实例对象（form）。
-    5 遍历 tempSlides 数组，分别将每一个图片对象，添加到 form 中（键为： file，根据接口文档获得）。
-    6 调用图片上传接口，传递form参数，并设置请求头 Content-Type 为 multipart/form-data。
-    7 通过接口返回值获取到的图片路径。
+    1 在 addHouse 方法中，从 state 里面获取到所有房屋数据。
+    2 使用 API 调用发布房源接口，传递所有房屋数据。
+    3 根据接口返回值中的状态码，判断是否发布成功。
+    4 如果状态码是 200，表示发布成功，就提示：发布成功，并跳转到已发布房源页面。
+    5 否则，就提示：服务器偷懒了，请稍后再试~。
   */
   addHouse = async () => {
-    const { tempSlides } = this.state
+    const {
+      tempSlides,
+      title,
+      description,
+      oriented,
+      supporting,
+      price,
+      roomType,
+      size,
+      floor,
+      community
+    } = this.state
     let houseImg = ''
 
+    // 上传房屋图片：
     if (tempSlides.length > 0) {
       // 已经有上传的图片了
       const form = new FormData()
@@ -166,7 +177,27 @@ export default class RentAdd extends Component {
       houseImg = res.data.body.join('|')
     }
 
-    console.log(houseImg)
+    // 发布房源
+    const res = await API.post('/user/houses', {
+      title,
+      description,
+      oriented,
+      supporting,
+      price,
+      roomType,
+      size,
+      floor,
+      community: community.id,
+      houseImg
+    })
+
+    if (res.data.status === 200) {
+      // 发布成功
+      Toast.info('发布成功', 1, null, false)
+      this.props.history.push('/rent')
+    } else {
+      Toast.info('服务器偷懒了，请稍后再试~', 2, null, false)
+    }
   }
 
   render() {
