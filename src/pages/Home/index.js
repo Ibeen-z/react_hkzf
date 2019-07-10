@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { lazy } from 'react'
 // 导入路由
 import { Route } from 'react-router-dom'
 // 导入 TabBar
@@ -8,10 +8,14 @@ import { TabBar } from 'antd-mobile'
 import './index.css'
 
 // 导入TabBar菜单的组件
-import News from '../News'
 import Index from '../Index'
-import HouseList from '../HouseList'
-import Profile from '../Profile'
+// import News from '../News'
+// import HouseList from '../HouseList'
+// import Profile from '../Profile'
+
+const News = lazy(() => import('../News'))
+const HouseList = lazy(() => import('../HouseList'))
+const Profile = lazy(() => import('../Profile'))
 
 // TabBar 数据
 const tabItems = [
