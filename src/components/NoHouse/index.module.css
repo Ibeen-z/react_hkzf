@@ -1,13 +1,20 @@
+.center{
+    margin-top: 50%;
+    margin-left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+}
+
 .root {
-  margin-top: 100px;
-  text-align: center;
-}
-
-.img {
-  width: 120px;
-  margin-bottom: 20px;
-}
-
-.msg {
-  color: #666;
-}
+    margin-top: 100px;
+    text-align: center;
+  }
+  
+  .img {
+    width: 120px;
+    margin-bottom: 20px;
+  }
+  
+  .msg {
+    color: #666;
+  }
+  

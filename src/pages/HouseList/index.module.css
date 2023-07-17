@@ -1,46 +1,33 @@
-.root {
-  /* padding-top: 45px; */
+
+.header{
+    height: 45px;
+    background-color: #f5f6f5;
+    padding: 0 10px;
 }
 
-/* 顶部导航栏样式 */
-.header {
-  height: 45px;
-  padding: 0 10px;
-  background-color: #f6f5f6;
+
+.searchHeader{
+    position: relative;
+    top: 0;
+    padding: 0;
 }
 
-.header :global(.icon-back) {
-  font-size: 16px;
-  color: #999;
+
+.header :global(.icon-back){
+    font-size: 16px !important;
+    color: #999;
+}
+.searchHeader :global(.icon-map){
+    color: #00ae66;
+}
+.searchHeader :global(.seacher){
+    height: 30px;
 }
 
-/* 覆盖 SearchHeader 组件的样式： */
-.searchHeader {
-  position: relative;
-  top: 0;
-  padding: 0;
-}
-
-.searchHeader :global(.icon-map) {
-  color: #00ae66;
-}
-
-.searchHeader :global(.search) {
-  height: 30px;
-}
-
-/* 房屋列表样式 */
-.houseItems {
-  padding: 0 15px;
-}
-
-.houseItems :global(.ReactVirtualized__List) {
-  padding-bottom: 50px;
-}
 
 .loading {
-  line-height: 120px;
-  text-align: center;
-  height: 110px;
-  background-color: #f6f5f6;
-}
+    line-height: 120px;
+    text-align: center;
+    height: 110px;
+    background-color: #f6f5f6;
+  }

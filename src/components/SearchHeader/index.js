@@ -7,7 +7,7 @@ import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
 
 // 导入样式
-import './index.scss'
+import './index.css'
 
 function SearchHeader({ history, cityName, className }) {
   return (

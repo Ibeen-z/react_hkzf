@@ -1,8 +1,6 @@
-import React from 'react'
-
+import React from "react";
 import PropTypes from 'prop-types'
-
-import styles from './index.module.css'
+import styles from "./index.module.css";
 
 function HouseItem({ src, title, desc, tags, price, onClick, style }) {
   return (
@@ -44,4 +42,4 @@ HouseItem.propTypes = {
   onClick: PropTypes.func
 }
 
-export default HouseItem
+export default HouseItem;

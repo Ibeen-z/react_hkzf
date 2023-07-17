@@ -3,7 +3,6 @@
   padding-bottom: 50px;
   background-color: #f6f5f6;
 }
-
 .root :global(.am-navbar-title) {
   color: #fff;
   font-size: 16px;
@@ -36,15 +35,21 @@
   position: absolute;
   z-index: 2;
   color: rgb(255, 255, 255);
-  background-color: transparent;
+  background-color: stransparent !important;
+  margin-top: 0 !important;
 }
-
+.navBar{
+  position: absolute;
+  background-color: transparent;
+  z-index: 2;
+  color: rgb(255, 255, 255);
+  margin-top: 0
+}
 /* 房屋基础信息 */
 .info {
   padding: 15px;
   background: #fff;
 }
-
 .infoTitle {
   font-weight: normal;
   font-size: 16px;
